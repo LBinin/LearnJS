@@ -1,7 +1,3 @@
-#### 感谢开源
-
-此笔记在阮一峰先生的 [JavaScript 标准参考教程（alpha）](http://javascript.ruanyifeng.com/) 为引导的基础下进行学习的笔记。
-
 #### JavaScript伴随着互联网的发展一起发展。互联网周边技术的快速发展，刺激和推动了JavaScript语言的发展。
 
 > 1996年，样式表标准CSS第一版发布。
