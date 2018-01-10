@@ -1,5 +1,5 @@
 * [介绍](README.md)
-* [JavaScript 历史](JavaScript 历史.md)
+* [JavaScript 历史](./JavaScript 历史.md)
 * 语法
   * [基本语法](语法/基本语法.md)
   * [数据类型](语法/数据类型.md)
@@ -15,6 +15,7 @@
   * [面向对象编程](面向对象编程/JS面向对象概述.md)
   * [this 关键字](面向对象编程/this关键字.md)
   * [prototype 对象](面向对象编程/prototype对象.md)
+  * [Object 对象与继承](面向对象编程/Object对象与继承.md)
 * 标准库
   <!-- * [Object对象](标准库/Object对象.md) -->
 * [面试问题合集](面试问题合集.md)
