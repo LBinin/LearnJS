@@ -271,6 +271,17 @@ var B = Object.create(A)
 B.print() // hello
 B.print === A.print // true
 B instanceof A // true
+
+// 等同于
+var A = function () {}
+A.prototype = {
+ print: function () {
+   console.log('hello')
+ }
+}
+
+var B = new A()
+B.print === A.prototype.print // true
 ```
 
 上面代码中l，我们可以通过 `Object.create` 方法以 **A** 对象为原型，生成了 **B** 对象。**B** 继承了 **A** 的所有属性和方法。
