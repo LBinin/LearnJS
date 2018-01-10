@@ -27,6 +27,13 @@ Object.getOwnPropertyNames(b) // ["sayHi"]
 
 `Object.keys` 方法只返回所有可以枚举的属性的键名（ 自身的属性 ）。
 
+由于JavaScript没有提供计算对象属性个数的方法，所以可以用这两个方法代替：
+
+```javascript
+Object.keys(o).length
+Object.getOwnPropertyNames(o).length
+```
+
 ---
 
 ### Object.prototype.hasOwnProperty()
