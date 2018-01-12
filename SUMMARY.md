@@ -26,4 +26,5 @@
   * [Math 对象](./标准库/Math对象.md)
   * [Date 对象](./标准库/Date对象.md)
   * [RegExp 对象](./标准库/RegExp对象.md)
+  * [JSON 对象](./标准库/JSON对象.md)
 * [面试问题合集](./面试问题合集.md)
