@@ -24,4 +24,5 @@
   * [Number 对象](./标准库/Number对象.md)
   * [String 对象](./标准库/String对象.md)
   * [Math 对象](./标准库/Math对象.md)
+  * [Date 对象](./标准库/Date对象.md)
 * [面试问题合集](./面试问题合集.md)
