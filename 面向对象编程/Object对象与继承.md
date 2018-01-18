@@ -178,5 +178,5 @@ function copyObject(orig) {
 | `Object.getOwnPropertyNames()`      |        | √                 | √     |             |
 | `Object.hasOwnProperty()` |        | √                 | √     |             |
 | `Object.keys`                       | √      |                   | √     |             |
-| `in` 运算符                         |        | √                 |       | √           |
 | `for...in` 循环                     | √      |                   |       | √           |
+| `in` 运算符                         |        | √                 |       | √           |
