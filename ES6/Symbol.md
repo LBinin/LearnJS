@@ -283,7 +283,7 @@ const FOO_KEY = Symbol('foo')
 ```javascript
 class MyClass {
   [Symbol.hasInstance](foo) {
-    return foo instanceof Array;
+    return foo instanceof Array
   }
 }
 
@@ -311,16 +311,16 @@ let obj = {
   [Symbol.toPrimitive](hint) {
     switch (hint) {
       case 'number':
-        return 123;
+        return 123
       case 'string':
-        return 'str';
+        return 'str'
       case 'default':
-        return 'default';
+        return 'default'
       default:
-        throw new Error();
+        throw new Error()
      }
    }
-};
+}
 
 2 * obj // 246
 3 + obj // '3default'
