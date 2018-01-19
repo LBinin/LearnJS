@@ -42,5 +42,8 @@
   * [数值的扩展](./ES6/数值的扩展.md)
   * [函数的扩展](./ES6/函数的扩展.md)
   * [数组的扩展](./ES6/数组的扩展.md)
-  <!-- * [let和const命令](./ES6/let和const命令.md) -->
+  * [Symbol](./ES6/Symbol.md)
+  * [Set 和 Map 数据结构](./ES6/Set和Map数据结构.md)
+  * [Iterator 和 for...of 循环](./ES6/Iterator和for...of循环.md)
+  <!-- * [Generator 函数的语法](./ES6/Generator函数的语法.md) -->
 * [面试问题合集](./面试问题合集.md)
