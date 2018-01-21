@@ -45,5 +45,8 @@
   * [Symbol](./ES6/Symbol.md)
   * [Set 和 Map 数据结构](./ES6/Set和Map数据结构.md)
   * [Iterator 和 for...of 循环](./ES6/Iterator和for...of循环.md)
-  <!-- * [Generator 函数的语法](./ES6/Generator函数的语法.md) -->
+  * [Proxy](./ES6/Proxy.md)
+  * [Reflect](./ES6/Reflect.md)
+  * [Promise](./ES6/Promise.md)
+  <!-- * [Generator函数的语法](./ES6/Generator函数的语法.md) -->
 * [面试问题合集](./面试问题合集.md)
