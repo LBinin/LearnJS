@@ -78,7 +78,7 @@
 - 如果 `then` 中的回调函数抛出一个错误，那么 `then` 返回的 **Promise** 将会成为拒绝状态，并且将抛出的错误作为拒绝状态的回调函数的参数值。
 - 如果 `then` 中的回调函数返回一个已经是接受状态的 **Promise** ，那么 `then` 返回的 **Promise** 也会成为接受状态，并且将那个 **Promise** 的接受状态的回调函数的参数值作为该被返回的 **Promise** 的接受状态回调函数的参数值。
 - 如果 `then` 中的回调函数返回一个已经是拒绝状态的 **Promise** ，那么 `then` 返回的 **Promise** 也会成为拒绝状态，并且将那个 **Promise** 的拒绝状态的回调函数的参数值作为该被返回的 **Promise** 的拒绝状态回调函数的参数值。
-- 如果 `then` 中的回调函数返回一个未定状态（pending）的 **Promise** ，那么 `then` 返回 **Promise** 的状态也是未定的，并且它的终态与那个 **Promise** 的终态相同；同时，它变为终态时调用的回调函数参数与那个 **Promise** 变为终态时的回调函数的参数是相同的。
+- 如果 `then` 中的回调函数返回一个未定状态（ pending ）的 **Promise** ，那么 `then` 返回 **Promise** 的状态也是未定的，并且它的终态与那个 **Promise** 的终态相同；同时，它变为终态时调用的回调函数参数与那个 **Promise** 变为终态时的回调函数的参数是相同的。
 
 举一个官网 [Promise.prototype.then() - JavaScript | MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise/then) 的实例：
 
@@ -164,7 +164,7 @@ promise.then(function(value) {
   // some code
 }).catch(function(error) {
   // 处理前面三个 Promise 产生的错误
-});
+})
 ```
 
 所以，一般来说，不要在 `then` 方法里面定义 Reject 状态的回调函数（ 即 `then` 的第二个参数 ），总是使用 `catch` 方法会更好一些。
@@ -175,15 +175,15 @@ promise.then(function(value) {
 const someAsyncThing = function() {
   return new Promise(function(resolve, reject) {
     // 下面一行会报错，因为x没有声明
-    resolve(x + 2);
-  });
-};
+    resolve(x + 2)
+  })
+}
 
 someAsyncThing().then(function() {
-  console.log('everything is great');
-});
+  console.log('everything is great')
+})
 
-setTimeout(() => { console.log(123) }, 2000);
+setTimeout(() => { console.log(123) }, 2000)
 // Uncaught (in promise) ReferenceError: x is not defined
 // 123
 ```
@@ -192,5 +192,122 @@ setTimeout(() => { console.log(123) }, 2000);
 
 ---
 
+### Promise.resolve()
+
+> 将现有对象转为 Promise 对象
+
+实际上，该方法等价于下面代码：
+
+```javascript
+Promise.resolve('foo')
+// 等价于
+new Promise(resolve => resolve('foo'))
+```
+
+`Promise.resolve` 方法的参数分成四种情况：
+
+1. 参数是 Promise 实例
+
+    那么 `Promise.resolve` 将不做任何修改、原封不动地返回这个实例。
+
+2. 参数是一个 `thenable` 对象，`thenable` 对象指的是具有 `then` 方法的对象，比如：
+
+    ```javascript
+    let thenable = {
+      then: function(resolve, reject) {
+        resolve(42)
+      }
+    }
+
+    let p1 = Promise.resolve(thenable)
+    p1.then(function(value) {
+      console.log(value)  // 42
+    })
+    ```
+
+3. 参数不是具有 `then` 方法的对象，或根本就不是对象
+
+    这时候，`Promise.resolve` 方法返回一个新的 **Promise** 对象，状态为 `resolved`，相当于：
+
+    ```javascript
+    Promise.resolve('foo')
+    // 等价于
+    new Promise(resolve => resolve('foo'))
+    ```
+
+4. 不带有任何参数
+
+    `Promise.resolve` 方法允许调用时不带参数，直接返回一个 `resolved` 状态的 **Promise** 对象。
+
+
+需要注意的是，立即 `resolve` 的 **Promise** 对象，是在本轮「事件循环」（event loop）的**结束时**，而不是在下一轮「事件循环」的**开始时**，来，我们来举个栗子 🌰
+
+```javascript
+setTimeout(() => console.log('three'))
+
+Promise.resolve().then(() => console.log('two'))
+
+console.log('one')
+// one
+// two
+// three
+```
+
+因为 `setTimeout` 在下一轮的「事件循环」开始阶段，`resolve` 在本轮事件的结束阶段，所以这两个操作都会在本轮同步事件 `console.log('one')` 之后，才输出对应内容。
+
+---
+
+### Promise.reject()
+
+> 返回一个新的 **Promise** 实例，该实例的状态为 `rejected`。
+
+该方法会生成一个 **Promise** 对象的实例，状态为 `rejected`，回调函数会立即执行：
+
+```javascript
+var p = Promise.reject('出错了')
+// 等同于
+var p = new Promise((resolve, reject) => reject('出错了'))
+
+p.then(null, function (s) {
+  console.log(s)
+})
+// 出错了
+```
+
+注意，`Promise.reject()` 方法的参数，会原封不动地作为 `reject` 的理由，变成后续方法的参数。这一点与 `Promise.resolve()` 方法不一致。
+
+---
+
 ### Promise.all()
 
+> 将多个 Promise 实例，包装成一个新的 Promise 实例。
+
+该方法接受一个数组作为参数，格式如下：
+
+```javascript
+var p = Promise.all([p1, p2, p3])
+```
+
+`p1`、`p2`、`p3` 都是 **Promise** 实例，如果不是，就会先调用 `Promise.resolve` 方法，将参数转为 **Promise** 实例。
+
+`p` 的状态由 `p1`、`p2`、`p3` 决定，存在两种情况：
+
+1. `resolve` 状态
+
+    当且仅当 `p1`、`p2`、`p3` 都为 `resolve` 状态。此时 `p1`、`p2`、`p3` 的返回值将组成一个数组，传递给 `p` 的回调函数（ `resolve` 回调函数 ）。
+
+1. `reject` 状态
+
+    只要 `p1`、`p2`、`p3` 其中任意一个转为 `reject` 状态。此时，第一个转为 `reject` 的实例的返回值，将会被传递给 `p` 的回调函数（ `reject` 回调函数 ）。
+
+注意，如果作为参数的 **Promise** 实例，自己定义了 `catch` 方法，那么它一旦被 `rejected`，并不会触发 `Promise.all()` 的 `catch` 方法。
+
+---
+
+### Promise.race()
+
+> 同样是将多个 **Promise** 实例，包装成一个新的 **Promise** 实例。
+
+`Promise.race()` 方法的参数与 `Promise.all()` 方法一样，如果不是 **Promise** 实例，就会先调用下面讲到的 `Promise.resolve` 方法，将参数转为 **Promise** 实例，再进一步处理。
+
+和 `Promise.all()` 的区别是：要 `p1`、`p2`、`p3` 之中有一个实例**率先**改变状态，`p` 的状态就跟着改变。那个率先改变的 **Promise** 实例的返回值，就传递给 `p` 的回调函数。
