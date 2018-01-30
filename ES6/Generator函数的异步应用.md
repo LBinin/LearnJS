@@ -90,7 +90,65 @@ Promise 的最大问题是代码冗余，原来的任务被 Promise 包装了一
 
 协程有点像函数，又有点像线程。它的运行流程大致如下：
 
-- 第一步，协程A开始执行。
-- 第二步，协程A执行到一半，进入暂停，执行权转移到协程B。
-- 第三步，（一段时间后）协程B交还执行权。
-- 第四步，协程A恢复执行。
+- 第一步，协程 `A` 开始执行。
+- 第二步，协程 `A` 执行到一半，进入暂停，执行权转移到协程 `B` 。
+- 第三步，（一段时间后）协程 `B` 交还执行权。
+- 第四步，协程 `A` 恢复执行。
+
+Generator 就是「协程」在 ES6 中的实现，接下来举个栗子 🌰
+
+```javascript
+// 封装一个异步操作
+var fetch = require('node-fetch')
+
+function* gen(){
+  var url = 'https://api.github.com/users/github'
+  var result = yield fetch(url)
+  console.log(result.bio)
+}
+
+// 执行操作
+var g = gen()
+var result = g.next()
+
+result.value.then(function(data){
+  return data.json()
+}).then(function(data){
+  g.next(data)
+})
+```
+
+内容都挺简单的，我就不一步步描述了。可以看到，虽然 Generator 函数将异步操作表示得很简洁，但是流程管理却不方便（ 即何时执行第一阶段、何时执行第二阶段 ）。
+
+---
+
+### Thunk 函数
+
+> 自动执行 Generator 函数的一种方法。
+
+所谓「传名调用」，即直接将函数参数中的表达式传入函数体，只在用到它的时候求值。避免了在表达式中进行了无用的计算降低性能。
+
+编译器的**传名调用**实现，往往是将参数放到一个「临时函数」之中，再将这个临时函数传入函数体。这个临时函数就叫做 Thunk 函数。
+
+我们来看看 JavaScript 中的 Thunk 函数：
+
+```javascript
+// 正常版本的readFile（多参数版本）
+fs.readFile(fileName, callback)
+
+// Thunk版本的readFile（单参数版本）
+var Thunk = function (fileName) {
+  return function (callback) {
+    return fs.readFile(fileName, callback)
+  }
+}
+
+var readFileThunk = Thunk(fileName)
+readFileThunk(callback)
+```
+
+上面的 `Thunk` 就是一个**临时函数**，然后通过临时函数的参数传入函数体。
+
+---
+
+### 
