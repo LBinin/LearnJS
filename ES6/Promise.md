@@ -308,6 +308,6 @@ var p = Promise.all([p1, p2, p3])
 
 > 同样是将多个 **Promise** 实例，包装成一个新的 **Promise** 实例。
 
-`Promise.race()` 方法的参数与 `Promise.all()` 方法一样，如果不是 **Promise** 实例，就会先调用下面讲到的 `Promise.resolve` 方法，将参数转为 **Promise** 实例，再进一步处理。
+`Promise.race()` 方法的参数与 `Promise.all()` 方法一样，如果不是 **Promise** 实例，就会先调用之前讲到的 `Promise.resolve` 方法，将参数转为 **Promise** 实例，再进一步处理。
 
 和 `Promise.all()` 的区别是：要 `p1`、`p2`、`p3` 之中有一个实例**率先**改变状态，`p` 的状态就跟着改变。那个率先改变的 **Promise** 实例的返回值，就传递给 `p` 的回调函数。
