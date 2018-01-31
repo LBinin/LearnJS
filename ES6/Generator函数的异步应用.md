@@ -151,4 +151,90 @@ readFileThunk(callback)
 
 ---
 
-### 
+### Generator 函数的流程管理
+
+前面说到 Thunk 函数，不过 Thunk 函数对异步编程有什么用呢？
+
+以前确实没什么用，但是 ES6 有了 Generator 函数，Thunk 函数现在可以用于 Generator 函数的「自动流程管理」。
+
+先说 Generator，它可以完成自动执行：
+
+```javascript
+function* gen() {
+  // ...
+}
+
+var g = gen()
+var res = g.next()
+
+while(!res.done){
+  console.log(res.value)
+  res = g.next()
+}
+```
+
+但是通过上面的代码可以看出来，Generator 可以完成自动执行所有任务，但是并不满足**执行完上一步后再执行下一步**，不适合异步操作。
+
+### Thunk 函数的自动流程管理
+
+所以这时候 Thunk 函数就派上用场了。由于 Thunk 函数可以在回调函数里，将执行权交还给 Generator 函数。Thunk 函数真正的威力，在于可以自动执行 Generator 函数。下面就是一个基于 Thunk 函数的 Generator 执行器。
+
+```javascript
+function run(fn) {
+  var gen = fn()
+
+  function next(err, data) {
+    var result = gen.next(data)
+    if (result.done) return
+    result.value(next)
+  }
+
+  next()
+}
+
+function* g() {
+  // ...
+}
+
+run(g)
+```
+
+上面代码的 `run` 函数，就是一个 Generator 函数的自动执行器。
+
+内部的 `next` 函数就是 Thunk 的**回调函数**。
+
+`next` 函数先将指针移到 Generator 函数的下一步（ `gen.next` 方法 ），然后判断 Generator 函数是否结束（ `result.done` 属性 ），如果没结束，就将 `next` 函数再传入 Thunk 函数（ `result.value` 属性 ），否则就直接退出。
+
+当然，前提是每一个**异步操作**，都要是 Thunk 函数，也就是说，跟在 `yield` 命令后面的必须是 Thunk 函数，才能在上面把 `next` 传入到返回的信息数组 `value` 中。
+
+### co 模块
+
+当然，tj大神早就在 2013 年就写了一个小工具 —— 「[co](https://github.com/tj/co)」，用于 Generator 函数的自动执行。
+
+用 **co** 写一个小例子，用于依次读取两个文件：
+
+```javascript
+var gen = function* () {
+  var f1 = yield readFile('/etc/fstab')
+  var f2 = yield readFile('/etc/shells')
+  console.log(f1.toString())
+  console.log(f2.toString())
+}
+```
+
+**co** 模块可以让我们不用编写 Generator 函数的执行器，只要将 Generator 函数只要传入co函数，就会自动执行：
+
+```javascript
+var co = require('co')
+co(gen)
+```
+
+此外，**co** 函数返回一个 **Promise** 对象，因此可以用 `then` 方法添加回调函数。
+
+```javascript
+co(gen).then(function (){
+  console.log('Generator 函数执行完成')
+})
+```
+
+上面代码中，等到 Generator 函数执行结束，就会输出一行提示。
