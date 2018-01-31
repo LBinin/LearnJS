@@ -1,0 +1,1 @@
+{"version":3,"sources":["example.js"],"names":[],"mappings":";;AAAA,IAAI,MAAM,CAAC,GAAD,EAAM,GAAN,EAAW,GAAX,EAAgB,GAAhB,CAAV;;;;;;;AAEA,uBAAc,GAAd,8HAAmB;AAAA,QAAV,CAAU;;AACjB,YAAQ,GAAR,CAAY,CAAZ,EADiB,CACD;AACjB","file":"compiled.js","sourcesContent":["var arr = ['a', 'b', 'c', 'd'];\n\nfor (let a of arr) {\n  console.log(a); // a b c d\n}"]}

@@ -48,5 +48,7 @@
   * [Proxy](./ES6/Proxy.md)
   * [Reflect](./ES6/Reflect.md)
   * [Promise](./ES6/Promise.md)
-  <!-- * [Generator函数的语法](./ES6/Generator函数的语法.md) -->
+  * [Generator 函数的语法](./ES6/Generator函数的语法.md)
+  * [Generator 函数的异步应用](./ES6/Generator函数的异步应用.md)
+  * [async 函数](./ES6/async函数.md)
 * [面试问题合集](./面试问题合集.md)

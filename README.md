@@ -1,7 +1,21 @@
-# function 感谢开源() {
+## function ES5() {
 
-此笔记在阮一峰老师的 [JavaScript 标准参考教程（alpha）](http://javascript.ruanyifeng.com/) 以及 [ECMAScript 6 入门](http://es6.ruanyifeng.com/) 为引导的基础下整理的学习笔记。在参考老师的教程基础上记录重点内容，结合自己查找的资料整合成此笔记，方便日后查阅。
+**const** guide = "[JavaScript 标准参考教程（alpha）](http://javascript.ruanyifeng.com/)"
 
-> 参考资料：[JavaScript 参考文档](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/)
+**const** intro = \`感谢阮一峰老师的 ${guide}，在参考老师的教程基础上记录重点内容，结合查找的资料整合，方便日后查阅。\`
 
-# };
+## }
+
+## function ES6() {
+
+**const** guide = "[ECMAScript 6 入门](http://es6.ruanyifeng.com/)"
+
+**const** intro = (\`依然感谢阮一峰老师的 ${guide}\`)
+
+## }
+
+## function reference() {
+
+**const** MDN = "[JavaScript 参考文档](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/)"
+
+## }
