@@ -14,8 +14,8 @@
 
 ## }
 
-## function reference() {
+**const** reference = {
 
-**const** MDN = "[JavaScript 参考文档](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/)"
+"MDN": "[JavaScript 参考文档](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/)",
 
-## }
+}
