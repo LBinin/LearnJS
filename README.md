@@ -2,7 +2,7 @@
 
 **const** guide = "[JavaScript 标准参考教程（alpha）](http://javascript.ruanyifeng.com/)"
 
-**const** intro = \`感谢阮一峰老师的 ${guide}，在参考老师的教程基础上记录重点内容，结合查找的资料整合，方便日后查阅。\`
+**const** intro = \`感谢阮一峰老师的 ${guide}，在参照老师的教程基础上，结合查找的资料整合，方便日后查阅。\`
 
 ## }
 
@@ -10,7 +10,7 @@
 
 **const** guide = "[ECMAScript 6 入门](http://es6.ruanyifeng.com/)"
 
-**const** intro = (\`依然感谢阮一峰老师的 ${guide}\`)
+**const** intro = \`依然感谢阮一峰老师的 ${guide}\`
 
 ## }
 
