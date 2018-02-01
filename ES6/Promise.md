@@ -302,6 +302,19 @@ var p = Promise.all([p1, p2, p3])
 
 注意，如果作为参数的 **Promise** 实例，自己定义了 `catch` 方法，那么它一旦被 `rejected`，并不会触发 `Promise.all()` 的 `catch` 方法。
 
+```javascript
+var promise1 = Promise.resolve(3)
+var promise2 = 42
+var promise3 = new Promise(function(resolve, reject) {
+  setTimeout(resolve, 100, 'foo')
+})
+
+Promise.all([promise1, promise2, promise3]).then(function(values) {
+  console.log(values)
+})
+// expected output: Array [3, 42, "foo"]
+```
+
 ---
 
 ### Promise.race()
