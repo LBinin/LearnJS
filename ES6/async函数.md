@@ -204,7 +204,56 @@ f()
 
 ---
 
+### 使用注意点
 
+1. 像之前说过的，如果需要对 `async` 函数内部进行错误的捕获与处理，需要添加 `try...catch` 代码快，或者使用 `catch` 方法。
+2. 如果多个 `await` 命令后面的操作不存在继发关系，就是前后顺序无所谓，没有必要一定要等前面一个任务执行完毕才执行，也就是可以同时触发的话，
+
+    举个例子：
+
+    ```javascript
+    let foo = await getFoo()
+    let bar = await getBar()
+    ```
+
+    上面两个是相互独立的异步操作，没有必要的前后关系，被写成继发关系的话就会比较耗时，完全可以让他们同时触发，现在有两种写法：
+
+    ```javascript
+    // 写法一，利用 Promise 的 all 方法
+    let [foo, bar] = await Promise.all([getFoo(), getBar()])
+
+    // 写法二
+    let fooPromise = getFoo()
+    let barPromise = getBar()
+    let foo = await fooPromise
+    let bar = await barPromise
+    ```
+
+3. `await` 命令只能用在 `async` 函数之中，如果用在普通函数，就会报错。
+
+---
+
+### 实例操作
+
+说了这么多不如来一个实例明白的快，现在我们来写一段，内容：读取数组里的 URL，然后依次请求，最后按顺序输出。
+
+先举一个 **Promise** 的例子，让我们看看可读性：
+
+```javascript
+function logInOrder(urls) {
+  // 远程读取所有URL
+  const textPromises = urls.map(url => {
+    // 获取所有 url 的内容，返回每个 Promise 对象给 textPromises 数组
+    return fetch(url).then(response => response.text())
+  })
+
+  // 按次序输出
+  textPromises.reduce((chain, textPromise) => {
+    return chain.then(() => textPromise) // 返回一个 Promise，该 Promise 成功的参数就是 textPromise 成功的参数。
+      .then(text => console.log(text)) // 处理 resolve 中的参数，也就是 fetch 的结果。
+  }, Promise.resolve())
+}
+```
 
 ---
 
