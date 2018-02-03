@@ -1,39 +1,40 @@
 * [介绍](./README.md)
 * [JavaScript 历史](./JavaScript 历史.md)
-* 语法
-  * [基本语法](./ES5/语法/基本语法.md)
-  * [数据类型](./ES5/语法/数据类型.md)
-  * [数值](./ES5/语法/数值.md)
-  * [字符串](./ES5/语法/字符串.md)
-  * [对象](./ES5/语法/对象.md)
-  * [数组](./ES5/语法/数组.md)
-  * [函数](./ES5/语法/函数.md)
-  * [运算符](./ES5/语法/运算符.md)
-  * [数据类型转换](./ES5/语法/数据类型转换.md)
-  * [错误处理机制](./ES5/语法/错误处理机制.md)
-* 面向对象编程
-  * [面向对象编程](./ES5/面向对象编程/JS面向对象概述.md)
-  * [this 关键字](./ES5/面向对象编程/this关键字.md)
-  * [prototype 对象](./ES5/面向对象编程/prototype对象.md)
-  * [Object 对象与继承](./ES5/面向对象编程/Object对象与继承.md)
-  * [面向对象编程的模式](./ES5/面向对象编程/面向对象编程的模式.md)
-* 标准库
-  * [Object 对象](./ES5/标准库/Object对象.md)
-  * [Array 对象](./ES5/标准库/Array对象.md)
-  * [包装对象](./ES5/标准库/包装对象.md)
-  * [Number 对象](./ES5/标准库/Number对象.md)
-  * [String 对象](./ES5/标准库/String对象.md)
-  * [Math 对象](./ES5/标准库/Math对象.md)
-  * [Date 对象](./ES5/标准库/Date对象.md)
-  * [RegExp 对象](./ES5/标准库/RegExp对象.md)
-  * [JSON 对象](./ES5/标准库/JSON对象.md)
-  * [属性描述对象](./ES5/标准库/属性描述对象.md)
-* 专题
-  * [定时器](./ES5/专题/定时器.md)
-  * [Promise 对象](./ES5/专题/Promise对象.md)
-  <!-- * [严格模式](./ES5/专题/严格模式.md) -->
-* DOM 模型
-  * [DOM 模型](./ES5/DOM模型/DOM模型.md)
+* ES5
+  * 语法
+    * [基本语法](./ES5/语法/基本语法.md)
+    * [数据类型](./ES5/语法/数据类型.md)
+    * [数值](./ES5/语法/数值.md)
+    * [字符串](./ES5/语法/字符串.md)
+    * [对象](./ES5/语法/对象.md)
+    * [数组](./ES5/语法/数组.md)
+    * [函数](./ES5/语法/函数.md)
+    * [运算符](./ES5/语法/运算符.md)
+    * [数据类型转换](./ES5/语法/数据类型转换.md)
+    * [错误处理机制](./ES5/语法/错误处理机制.md)
+  * 面向对象编程
+    * [面向对象编程](./ES5/面向对象编程/JS面向对象概述.md)
+    * [this 关键字](./ES5/面向对象编程/this关键字.md)
+    * [prototype 对象](./ES5/面向对象编程/prototype对象.md)
+    * [Object 对象与继承](./ES5/面向对象编程/Object对象与继承.md)
+    * [面向对象编程的模式](./ES5/面向对象编程/面向对象编程的模式.md)
+  * 标准库
+    * [Object 对象](./ES5/标准库/Object对象.md)
+    * [Array 对象](./ES5/标准库/Array对象.md)
+    * [包装对象](./ES5/标准库/包装对象.md)
+    * [Number 对象](./ES5/标准库/Number对象.md)
+    * [String 对象](./ES5/标准库/String对象.md)
+    * [Math 对象](./ES5/标准库/Math对象.md)
+    * [Date 对象](./ES5/标准库/Date对象.md)
+    * [RegExp 对象](./ES5/标准库/RegExp对象.md)
+    * [JSON 对象](./ES5/标准库/JSON对象.md)
+    * [属性描述对象](./ES5/标准库/属性描述对象.md)
+  * 专题
+    * [定时器](./ES5/专题/定时器.md)
+    * [Promise 对象](./ES5/专题/Promise对象.md)
+    <!-- * [严格模式](./ES5/专题/严格模式.md) -->
+  * DOM 模型
+    * [DOM 模型](./ES5/DOM模型/DOM模型.md)
 * ES6
   * [ECMAScript6 简介](./ES6/ECMAScript6简介.md)
   * [let 和 const命令](./ES6/let和const命令.md)
