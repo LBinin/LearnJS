@@ -249,11 +249,47 @@ function logInOrder(urls) {
 
   // 按次序输出
   textPromises.reduce((chain, textPromise) => {
-    return chain.then(() => textPromise) // 返回一个 Promise，该 Promise 成功的参数就是 textPromise 成功的参数。
+    return chain.then(() => textPromise) // 返回一个 Promise，该 Promise 成功的参数就是 textPromise 中一个元素成功的参数。
       .then(text => console.log(text)) // 处理 resolve 中的参数，也就是 fetch 的结果。
   }, Promise.resolve())
 }
 ```
+
+说实话可读性不够高，上面的代码片段使用 `fetch` 方法，同时远程读取一组 URL。每个 `fetch` 操作都返回一个 **Promise** 对象，放入 `textPromises` 数组。然后，`reduce` 方法依次处理每个 **Promise** 对象，然后使用 `then`，将所有 **Promise** 对象连起来，因此就可以依次输出结果。
+
+接下来我们使用 `async` 函数改写上面的代码片段：
+
+```javascript
+async function logInOrder(urls) {
+  for (const url of urls) {
+    const response = await fetch(url)
+    console.log(await response.text())
+  }
+}
+```
+
+是不是感觉清晰多了，可读性也变高了：依次读取每个 URL，然后使用 `fetch` 方法获取内容，输出内容，然后读取下一个 URL。
+
+这种方法是清晰了不少，但是这样的操作不是继发的，每次都要等待上一个 URL 的内容读取成功后才能读取下一个 URL，可以说是非常的耗时了。
+
+接下来我们改成继发的操作：
+
+```javascript
+async function logInOrder(urls) {
+  // 并发读取 URL 内容，将读取操作的 Promise 储存起来
+  var textPromises = urls.map(async url => {
+    const response = await fetch(url)
+    return await response.text()
+  })
+
+  // 依次顺序输出，也就是等待数组中每个 Promise 为 resolve 的时候
+  for (let textPromise of textPromises) {
+    console.lot(await textPromise)
+  }
+}
+```
+
+在上述代码中，虽然 `map` 方法的参数是 `async` 函数，但它是「并发执行」的，因为只有 `async` 函数内部是「继发执行」，外部不受影响。后面的 `for..of` 循环内部使用了 `await`，因此实现了**按顺序输出**。
 
 ---
 
