@@ -1,35 +1,24 @@
-'use strict';
+"use strict";
 
-var pipe = function pipe(value) {
-  var funcStack = []; // 存储操作
-  // 过滤器
-  var oproxy = new Proxy({}, {
-    get: function get(pipeObject, fnName) {
-      // pipeObject 为上一层传下来的 Proxy 实例
-      if (fnName === 'get') {
-        // 如果属性名为 get
-        return funcStack.reduce(function (val, fn) {
-          return fn(val); // 依次调用 funcStack 中的函数，初始值为 value
-        }, value);
-      }
-      funcStack.push(myMath[fnName]); // 不为 get 的话就将操作存入数组
-      return oproxy; // 返回 Proxy 实例给下一层使用
-    }
-  });
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-  return oproxy;
-};
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-var myMath = {
-  double: function double(val) {
-    return val * 2;
-  },
-  pow: function pow(val) {
-    return val * val;
-  },
-  reverseInt: function reverseInt(val) {
-    return Number(val.toString().split('').reverse().join('') | 0);
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ReactCounter = function (_React$Component) {
+  _inherits(ReactCounter, _React$Component);
+
+  function ReactCounter(props) {
+    _classCallCheck(this, ReactCounter);
+
+    var _this = _possibleConstructorReturn(this, (ReactCounter.__proto__ || Object.getPrototypeOf(ReactCounter)).call(this, props));
+
+    _this.state = {
+      count: 0
+    };
+    return _this;
   }
-};
 
-console.log(pipe(3).double.pow.reverseInt.get); // 63
+  return ReactCounter;
+}(React.Component);
