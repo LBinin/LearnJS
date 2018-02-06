@@ -52,5 +52,6 @@
   * [Generator 函数的语法](./ES6/Generator函数的语法.md)
   * [Generator 函数的异步应用](./ES6/Generator函数的异步应用.md)
   * [async 函数](./ES6/async函数.md)
-  * [Class 的基本语法与继承](./ES6/Class的基本语法与继承.md)
+  * [Class 的基本语法](./ES6/Class的基本语法.md)
+  * [Class 的继承](./ES6/Class的继承.md)
 * [面试问题合集](./面试问题合集.md)
