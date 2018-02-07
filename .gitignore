@@ -58,3 +58,5 @@ typings/
 .env
 
 ES6/babel
+
+NodeJS/noupload
