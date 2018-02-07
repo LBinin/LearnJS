@@ -1,0 +1,17 @@
+{
+  "name": "schoolcalendar",
+  "version": "1.0.0",
+  "description": "湘大校历接口",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bigno",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.0",
+    "cheerio": "^1.0.0-rc.2",
+    "express": "^4.16.2",
+    "superagent": "^3.8.2"
+  }
+}
