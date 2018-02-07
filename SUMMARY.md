@@ -54,4 +54,9 @@
   * [async 函数](./ES6/async函数.md)
   * [Class 的基本语法](./ES6/Class的基本语法.md)
   * [Class 的继承](./ES6/Class的继承.md)
+  * [Module 的语法](./ES6/Module的语法.md)
+  * [Module 的加载实现](./ES6/Module的加载实现.md)
+<!-- * NodeJS
+  * [CommonJS规范](./NodeJS/CommonJS规范.md) -->
+* [面试问题合集](./编程风格.md)
 * [面试问题合集](./面试问题合集.md)
