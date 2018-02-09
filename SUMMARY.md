@@ -56,7 +56,8 @@
   * [Class 的继承](./ES6/Class的继承.md)
   * [Module 的语法](./ES6/Module的语法.md)
   * [Module 的加载实现](./ES6/Module的加载实现.md)
-<!-- * NodeJS
-  * [CommonJS规范](./NodeJS/CommonJS规范.md) -->
+* NodeJS
+  * [Nodejs 概述](./NodeJS/Nodejs概述.md)
+  * [CommonJS 规范](./NodeJS/CommonJS规范.md)
 * [面试问题合集](./编程风格.md)
 * [面试问题合集](./面试问题合集.md)
