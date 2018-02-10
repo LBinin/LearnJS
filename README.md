@@ -18,7 +18,7 @@
 
 **const** guide = [
   '[阮老师的隐藏副本](http://javascript.ruanyifeng.com/nodejs/basic.html)',
-  '[七天学会NodeJS](http://nqdeng.github.io/7-days-nodejs/#1.5.4)',
+  '[七天学会NodeJS](http://nqdeng.github.io/7-days-nodejs/)',
   '[Node.js 包教不包会](https://github.com/alsotang/node-lessons)'
 ]
 
