@@ -27,6 +27,16 @@
 
 ## }
 
+## function webpack() {
+
+**const** guide = [
+  '[指南 | webpack 中文网](https://www.webpackjs.com/guides/)',
+  '[阮老师的 webpack demo](https://github.com/ruanyf/webpack-demos)',
+  '[Webpack 入门教程](http://www.runoob.com/w3cnote/webpack-tutorial.html)'
+]
+
+## }
+
 **const** reference = {
 
 'MDN': '[JavaScript 参考文档](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/)',
