@@ -4,6 +4,35 @@
 
 ---
 
+## webpack 简介
+
+- 概述
+
+    详见 [Webpack 概念](../概念.md)。
+
+- 版本更迭、功能进化
+
+    - webpack v1.0.0 —— 2014.2.20
+
+        1. 编译、打包
+        2. HMR（ 热模块更新 ）
+        3. 代码分割
+        4. 文件处理（ Loader、Plugin ）
+
+    - webpack v2.2.0 —— 2017.1.18
+
+        1. Tree Shaking
+        2. ES module（ 在之前的版本需要使用 Babel，只是 module 语法 ）
+        3. 动态 Import（ `import()` ）
+        4. 新官网、新文档
+
+    - webpack v3.0.0 —— 2017.6.19
+
+        1. Scopr Hoisting（ 作用域提升 ）
+        2. Magic Comments（ 配合动态 `import` 使用 ）
+
+---
+
 ## 知识点
 
 - [基础知识](#基础知识)
@@ -13,7 +42,7 @@
 
 - [文件处理](#文件处理)
 
-    - 编译 ES6 / 7
+    - [编译 ES6 / 7](#编译%20ES6%20/%207)
     - 编译 TypeScript
     - 编译 Less / Sass
     - PostCss 处理浏览器前缀
@@ -67,6 +96,8 @@
 
 - JS 模块化
 
+    其中更详细的细节可以参考：[AMD, CMD, CommonJS和UMD](https://www.jianshu.com/p/bd4585b737d7)
+
     前端 JS 模块化的进化过程：
 
     1. 命名空间
@@ -83,13 +114,13 @@
         }
         ```
     
-    2. CommonJS（ 服务端 ）
+    2. CommonJS（ 服务端 - 掌握 ）
 
         一个文件就是一个模块，外部文件无法读取内部变量以及方法，只能通过 `module.exports` 暴露接口。外部文件通过 `require` 方法引入模块以获得内容。
 
         由于 CommonJS 运行在 NodeJS 服务端，这些 `require` 命令相当于是读取本地文件，以至于 `require` 命令是「同步执行」的。
 
-    3. AMD、CMD、UMD（ 浏览器端 ）
+    3. AMD、CMD、UMD（ 浏览器端 - 了解 ）
 
         Async Module Definition（ 异步模块定义 ）。其使用 `definde` 命令定义模块，使用 `require` 命令引用模块。
         
@@ -122,7 +153,7 @@
 
         CMD 是 **SeaJS** 在推广过程中对模块定义的规范化产出。
 
-        **UMD 推荐写法**：
+        **CMD 推荐写法**：
 
         ```javascript
         define(function(require, exports, module) {
@@ -138,17 +169,128 @@
 
         ---
 
+        Universal Module Definition（ 通用模块定义 ），是通用的模块解决方案。
+
+        UMD 实际上做三件事情：
+
+        1. 判断是否支持 AMD。
+        2. 判断是否支持 CommonJS 和 UMD。
+        3. 如果上述两步都不支持，则声明为全局变量。
+
+        ---
+
         AMD 和 CMD 的区别：对于依赖的模块，AMD 是提前执行（ 编译后相当于把所有 `require` 前置 ），CMD 是延迟执行（ 也就是执行到需要的模块才执行 `require` ）。CMD 推崇依赖就近，AMD 推崇依赖前置。
 
-    4. ES 6 module
+    4. ES 6 module（ 掌握 ）
 
-        ESM（ EcmaScript Module ），一个文件就是一个模块，使用 `import` 和 `export` 引入模块和暴露内容。
+        ESM（ EcmaScript Module ），一个文件就是一个模块，使用 `import` 和 `export` 引入模块和暴露内容。具体内容可以查看 [Module 语法](../../ES6/Module的语法.md)。
+
+        ```javascript
+        import theDefault, { named1, named2 } from 'src/mylib'
+        // 等同
+        import theDefault from 'src/mylib'
+        import { named1, named2 } from 'src/mylib'
+
+        // 重命名
+        import { named1 as myNamed1, named2 } from 'src/mylib'
+
+        // 加载所有暴露的方法、变量
+        import * as mylib from 'src/mylib'
+
+        // 引用
+        import 'src/mylib'
+        ```
 
 - CSS 模块化
+
+    CSS 模块化 实际上就是 CSS 的设计模式，现如今大致有如下设计模式：
+
+    - OOCSS
+
+        Object Oriented CSS（ 面向对象的 CSS ），资料：[OOCSS——概念篇](https://www.w3cplus.com/css/oocss-concept)。目的为了结构和设计的分离，容器和内容的分离。开发人员可以获得在不同地方使用相同的 CSS 类。
+
+    - SMACSS
+    - Atomic CSS
+    - MCSS
+    - AMCSS
+    - BEM
 
 ---
 
 ## 文件处理
+
+### 编译 ES6 / 7
+
+编译 ES6 / 7 我们需要使用 **Babel** 生成静态文件，使用的 loader 的是 **Babel-loader**。
+
+结合 webpack 使用说明：[使用 Babel | Babel中文网](https://babeljs.cn/docs/setup/#installation)。
+
+**Babel Polyfill**：
+
+> 由于各个浏览器对于标准的实现不一致，所以我们需要它保持开发中相同的 API（ 会污染全局环境 ）。
+
+- 全局垫片
+- 为应用准备
+
+**# 安装**
+
+```bash
+npm i --save babel-polyfill
+```
+
+**# 使用**
+
+```javascript
+// index.js
+import 'babel-polyfill'
+```
+
+```javascript
+// webpack.config.js
+module.exports = {
+    // ...
+    module: {
+        rules: [
+            {
+                text: /\.js$/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            ['@babel/preset-env', {
+                                target: {
+                                    broswer: ['last 2 version']
+                                }
+                            }]
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}
+// 或者使用 .babelrc
+```
+
+**Babel Runtime Transform**：
+
+> 相对于 `Babel Polyfill`，生成局部的方法或变量，不会污染全局变量。而且在使用的
+
+- 局部垫片
+- 为开发框架准备
+
+**# 安装**
+
+```bash
+$ npm i --save-dev babel-plugin-transform-runtime
+$ npm i --save babel-runtime
+```
+
+**# 使用**
+
+
+```
+```
 
 ---
 
