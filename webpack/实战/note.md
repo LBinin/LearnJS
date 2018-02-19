@@ -42,8 +42,9 @@
 
 - [文件处理](#文件处理)
 
-    - [编译 ES6 / 7](#编译%20ES6%20/%207)
+    - [编译 ES6 / 7](#%E7%BC%96%E8%AF%91-es6--7)
     - 编译 TypeScript
+    - 打包公共代码
     - 编译 Less / Sass
     - PostCss 处理浏览器前缀
     - Css nano 压缩 CSS
@@ -252,14 +253,14 @@ module.exports = {
     module: {
         rules: [
             {
-                text: /\.js$/,
+                test: /\.js$/,
                 use: {
                     loader: 'babel-loader',
                     options: {
                         presets: [
                             ['@babel/preset-env', {
                                 target: {
-                                    broswer: ['last 2 version']
+                                    browsers: ['last 2 version']
                                 }
                             }]
                         ]
@@ -286,11 +287,157 @@ $ npm i --save-dev babel-plugin-transform-runtime
 $ npm i --save babel-runtime
 ```
 
+或者
+
+```bash
+$ npm i --save-dev @babel/plugin-transform-runtime
+$ npm i --save @babel/runtime
+```
+
 **# 使用**
 
+新建文件 `.babelrc`，内容如下： 
 
+```json
+{
+    "presets": [
+        ["env", {
+            "target": {
+                "browsers": ["last 2 version"]
+            }
+        }]
+    ],
+    "plugins": ["transform-runtime"]
+}
 ```
+
+或者（ 对应上面的第二种安装方法 ）
+
+```json
+{
+    "presets": [
+        ["@babel/preset-env", {
+            "target": {
+                "browsers": ["last 2 version"]
+            }
+        }]
+    ],
+    "plugins": ["@babel/transform-runtime"]
+}
 ```
+
+---
+
+### 编译 TypeScript
+
+**# 安装**
+
+```bash
+$ npm i --save-dev typescript
+$ npm i --save-dev ts-loader
+$ npm i --save-dev awesome-typescript-loader
+```
+
+**# 配置**
+
+创建并配置 `tsconfig.json` 文件，详细内容：[Tsconfig Json - TypeScript 中文手册](https://typescript.bootcss.com/tsconfig-json.html)
+
+其中的配置选项详情：[Compiler Options - TypeScript 中文手册](https://typescript.bootcss.com/compiler-options.html)
+
+```javascript
+// webpack.config.js
+module.exports = {
+    entry: {
+        app: './src/app.ts'
+    },
+    output: {
+        filename: '[name].bundle.js'
+    },
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: {
+                    loader: 'ts-loader',
+                }
+            }
+        ]
+    }
+}
+```
+
+在 `tsconfig.json` 中配置如下选项：
+
+```json
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "allowJs": true
+    },
+    "include": [
+        "./src/*"
+    ],
+    "exclude": [
+        "./node_modules"
+    ]
+}
+```
+
+**# 声明文件**
+
+当我们引入并使用第三方类库的时候，各个类库都有自己的一套类型标准，也就是声明文件，我们可以安装对应类库的声明文件来检查我们是否正确使用第三方类库：
+
+```bash
+npm i --save @types/lodash
+npm i --save @types/vue
+```
+
+这样我们就可以在比如：传错参数的时候，在构建过程（ `webpack` 命令 ）能够得到明确的错误的反馈。
+
+**# Typings**
+
+作用和上方的「声明文件」相同
+
+```bash
+npm i -g typings
+typings install lodash --save
+```
+
+这时候在我们发项目根目录发现生成了一个 `typings.json` 的文件以及 `typings` 文件夹，类似 `node_modules`。
+
+**问**：如何使用呢？
+
+**答**：在 `tsconfig.json` 文件中，在 `compilerOptions.typeRoots` 数组下添加 `./typings/modules`，告诉编译器到该目录下寻找声明文件。
+
+```json
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "typeRoots": [
+            "./node_modules/@type",
+            "./typings/modules"
+        ]
+    }
+}
+```
+
+---
+
+### 打包公共代码、代码分割、懒加载
+
+- 打包公共代码、代码分割详见：[代码分离](../代码分离.md)
+
+- 懒加载（ lazy load ）
+
+> 让用户在尽可能更短的时间内看到想要的页面。避免带宽浪费、长时间加载。
+
+1. webpack methods（ webpack 内置方法 `require.ensure` 和 `require.include` ）
+
+    详情：[Module Method | webpack](https://www.webpackjs.com/api/module-methods/#require-ensure)
+
+2. ES 2015 load spec（ 2015 规范 ）
 
 ---
 
