@@ -46,6 +46,7 @@
     - [编译 TypeScript](#编译-TypeScript)
     - [打包公共代码、代码分割、懒加载](#打包公共代码、代码分割、懒加载)
     - 编译 Less / Sass
+    - 提取 CSS
     - PostCss 处理浏览器前缀
     - Css nano 压缩 CSS
     - 自动生成 HTML 模板文件
@@ -532,13 +533,30 @@ typings install lodash --save
     **`style-loader` 配置选项**：
 
     - `insertAt`：控制 `<style>` 标签的插入位置。
-    - `insertInto`：控制 `<style>` 标签插入到 DOM。
-    - `singleton`：控制是否只使用**一个** `<style>` 标签。
-    - `transform`：用于 CSS 转化。是一个「函数」，接收处理前的 CSS 内容为参数，需要 `return` 处理后的 CSS 内容。
+    - `insertInto`：控制 `<style>` 标签插入到 DOM。（ CSS 选择器 ）
+    - `singleton`：控制是否只使用**一个** `<style>` 标签。（ 布尔值 ）
+    - `transform`：在用于 CSS 转化。是一个「文件路径」，该文件暴露一个函数，这个函数接收处理前的 CSS 内容为参数，需要 `return` 处理后的 CSS 内容。（ 在**每个** `<style>` 标签**插入**的时候执行的，而不是在打包的时候执行的，所以可以拿到 `window` 等参数 ）
 
     更多详情：[style-loader | webpack](https://www.webpackjs.com/loaders/style-loader/)
 
 - `css-loader` 主要用于让 JavaScript 可以 `import` 一个 CSS 文件，以及处理 CSS 内容，并将处理后的内容传递给 `sytle-loader`。
+
+    **`css-loader` 配置选项**：
+
+    - `alias`：解析时候的别名。与 **webpack** 的 `resolve.alias` 的语法相同。
+    - `importLoader`：用于配置「`css-loader` 作用于 `@import` 的资源之前」有多少个 loader。
+    - `minimize`：用于控制是否压缩 CSS 内容。（ 基于 **cssnano** 的 minifier ）
+    - `localIdentName`：控制选择器名称，如 `[path][name]__[local]--[hash:base64:5]`（ 当前 CSS 文件路径 + 当前 CSS 文件的名称 + 本地样式的名称 + 5 位的 Base64 ）。
+    - `modules`：控制是否启用 CSS 模块规范。
+
+        CSS 模块规范：
+
+        - `:local`：定义局部作用域的一个样式。
+        - `:global`：定义全局作用域的一个样式。
+        - `compose:`：继承样式。
+        - `compose: ... from path`：引入外部样式。
+
+    更多详情：[css-loader | webpack](https://www.webpackjs.com/loaders/css-loader/)
 
 **# 安装**
 
@@ -575,6 +593,42 @@ module.exports = {
     }
 }
 ```
+
+**现在**，我们开始配置 Less / Sass：
+
+首先安装 Less / Sass 以及对应的 loader：
+
+```bash
+$ npm i --save-dev less less-loader
+$ npm i --save-dev node-sass sass-loader
+```
+
+然后在 `webpack.config.js` 中配置（ 以 less 文件为例，注意 loader 的顺序 ）：
+
+```javascript
+module: {
+    rules: [
+        {
+            test: /\.less$/,
+            use: [
+                {
+                    loader: 'style-loader',
+                    options: {}
+                },
+                {
+                    loader: 'css-loader',
+                    options: {}
+                },
+                {
+                    loader: 'less-loader',
+                }
+            ]
+        }
+    ]
+}
+```
+
+然后就可以在模块中引入 `less` 文件啦。
 
 ---
 
