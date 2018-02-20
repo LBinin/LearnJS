@@ -632,6 +632,137 @@ module: {
 
 ---
 
+### 提取 CSS
+
+方式：
+
+1. `extract-loader`，详情 [extract-loader | webpack](https://www.webpackjs.com/loaders/extract-loader/)
+2. `ExtractTextWebpackPlugin` 插件，详情 [ExtractTextWebpackPlugin | webpack](https://www.webpackjs.com/plugins/extract-text-webpack-plugin/)
+
+推荐使用 `ExtractTextWebpackPlugin` 插件，这种方法较为主流。
+
+**# 安装**
+
+```bash
+$ npm i --save-dev extract-text-webpack-plugin
+```
+
+**# 配置 & 使用**
+
+在 `webpack.config.js` 配置文件中添加以下内容：
+
+```javascript
+const ExtractTextPlugin = require("extract-text-webpack-plugin")
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+          fallback: "style-loader",
+          use: "css-loader"
+        })
+      }
+    ]
+  },
+  plugins: [
+    new ExtractTextPlugin("styles.css"), // 输出文件名为 style.css
+  ]
+}
+```
+
+解析：
+
+在 `plugins` 添加 `ExtractTextPlugin` 插件，参数为一个配置对象，如：
+
+```javascript
+plugins: {
+    new ExtractTextPlugin({
+        filename: '[name].min.js'
+    })
+}
+```
+
+然后在 `use` 字段使用 `ExtractTextPlugin` 的 `extract` 方法，如：
+
+```javascript
+rules: [
+    {
+        test: /\.css$/, // 对于 CSS 文件
+        // 进行提取，extract 方法接收一个配置对象作为参数
+        use: ExtractTextPlugin.extract({
+            fallback: "style-loader", // 不提取时的使用方式
+            use: "css-loader" // 处理内容的 loader
+        })
+    }
+]
+```
+
+如果有多于一个 `ExtractTextPlugin` 示例的情形，则应该使用此方法每个实例上的 `extract` 方法：
+
+```javascript
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+
+// 创建多个实例
+const extractCSS = new ExtractTextPlugin('stylesheets/[name]-one.css')
+const extractLESS = new ExtractTextPlugin('stylesheets/[name]-two.css')
+
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: extractCSS.extract([ 'css-loader', 'postcss-loader' ])
+      },
+      {
+        test: /\.less$/i,
+        use: extractLESS.extract([ 'css-loader', 'less-loader' ])
+      },
+    ]
+  },
+  plugins: [
+    extractCSS,
+    extractLESS
+  ]
+}
+```
+
+配合 Less 使用 `ExtractTextPlugin`：
+
+```javascript
+// webpack.config.js
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+
+module.exports = {
+    // ...
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: ['css-loader', 'less-loader']
+                })
+            }
+        ]
+    }
+    plugins: [
+        new ExtractTextPlugin('[name].css')
+    ]
+}
+```
+
+❗️但是通过这中方式生成的 CSS 文件不会自动的插入到 HTML 文档流中，所以 HTML 中的 `<link>` 标签需要手动添加。
+
+❗️此外，在 `plugins` 中实例化 `ExtractTextPlugin` 模块的时候，配置对象中还有一个需要注意的选项 `allChunk`。
+
+该选项为一个「布尔值」，如果为 `true` 则会将所有 `import` 的 CSS 文件（ 以上面代码为例 ）都提取出来生成新的 CSS 文件。如果为 `false` （ 默认 ）的话，则仅从初始的 chunk 中提取（ 也就是入口文件同步加载的 CSS，排除了异步加载的 CSS 模块 ）其他动态加载的 CSS 会放在各自的模块中加载，也就是使用 `fallback` 中指定的方式。
+
+当使用 `CommonsChunkPlugin` 并且在公共 chunk 中有来自 `ExtractTextPlugin.extract` 提取的 chunk 时，`allChunks` 必须设置为 `true`。
+
+---
+
 ## 开发环境
 
 ---
