@@ -43,8 +43,8 @@
 - [文件处理](#文件处理)
 
     - [编译 ES6 / 7](#%E7%BC%96%E8%AF%91-es6--7)
-    - 编译 TypeScript
-    - 打包公共代码
+    - [编译 TypeScript](#编译-TypeScript)
+    - [打包公共代码、代码分割、懒加载](#打包公共代码、代码分割、懒加载)
     - 编译 Less / Sass
     - PostCss 处理浏览器前缀
     - Css nano 压缩 CSS
@@ -140,7 +140,7 @@
           // 模块输出( 参数为模块依赖，以在内部使用 )
           function (require, exports, beta) {
             exports.verb = function() {
-              return beta.verb();
+              return beta.verb()
               // 或者
               return require('beta').verb()
             }
@@ -275,7 +275,7 @@ module.exports = {
 
 **Babel Runtime Transform**：
 
-> 相对于 `Babel Polyfill`，生成局部的方法或变量，不会污染全局变量。而且在使用的
+> 相对于 `Babel Polyfill`，生成局部的方法或变量，不会污染全局变量。
 
 - 局部垫片
 - 为开发框架准备
@@ -435,9 +435,146 @@ typings install lodash --save
 
 1. webpack methods（ webpack 内置方法 `require.ensure` 和 `require.include` ）
 
-    详情：[Module Method | webpack](https://www.webpackjs.com/api/module-methods/#require-ensure)
+    - `require.ensure` 详情：[Module Method | webpack](https://www.webpackjs.com/api/module-methods/#require-ensure)
+
+        ```javascript
+        //预加载 懒执行
+        require.ensure(['./mod.js'], function(require){ // 这里数组里是要预加载的模块，不写的话不会先下载
+            var mod = require('./mod.js') // 执行 mod.js
+            mod.show()
+        }, 'chunkName')
+        ```
+
+        上面的例子表示：第一个参数「预加载的依赖」数组中的 `mod.js` 会被浏览器下载（ 预加载 ），但是 `mod.js` 的内容不会被立即执行（ 懒执行 ），在第二个参数「回调函数」中 `require` 调用的时候才会真正执行。构建后生成的 chunk 的 `Chunk Nmaes` 会被指定为第三个参数「chunk 的名称」。
+
+    - `require.include` 详情：[Module Method | webpack](https://www.webpackjs.com/api/module-methods/#require-include)
+
+        `require.include` 只接受一个参数，就是需要加载的模块。作用是只加载，但是执行，和 `require.ensure` 类似，区别是它只接收一个参数，其中一个使用场景如下：
+
+        > 当两个子模块都依赖「同一个」第三方模块的时候，可以在父模块中**提前加载**，子模块就不会再次加载该第三方模块。
 
 2. ES 2015 load spec（ 2015 规范 ）
+
+    `import()` 命令：该命令接受一个「字符串」参数，用于动态加载模块。该命令返回一个 **Promise** 对象。
+
+    需要注意的是：通过该方法，默认不添加对应 chunk 的 `chunkName`，如果需要添加 `chunkName` 需要在 `import` 方法中添加注释，如：
+
+    ```javascript
+    import(/* webpackChunkName: "print" */ './print').then(module => {
+        var print = module.default
+        print()
+    })
+    ```
+
+    这时候该 chunk 的 `chunkName` 便为注释中的 `print`（ 记得添加双引号 ），并在 `webpack.config.js` 中使用 `output.chunkFilename` 控制文件名。
+
+    **注意**：通过上面两种方法引入的模块的 bundle 名称由 `output.chunkFilename` 属性控制，支持 `[name]` 等占位符。
+
+---
+
+### 编译 Less / Sass
+
+说到结合 **webpack** 对 Less 和 Sass 进行编译之前，不得不先说说在 **webpack** 中对 CSS 的处理。
+
+在 webpack 中加载 CSS 可以查看：[资源管理 / 加载 CSS](../资源管理.md#加载-CSS)。
+
+该小结的主要内容：
+
+- 引入
+- CSS modules
+- 配置 Less / Sass
+- 提取 CSS 代码（ 利于缓存以及减小 bundle 大小 ）
+
+这里处理 CSS 有两个关键的基础 loader：
+
+- `style-loader` 主要用于向 HTML 文档流中创建 `<style>` 标签。
+
+    `style-loader` 拥有以下两个插件：
+
+    - `style-loader/url`：用于配合 `file-loader`，将引入的 CSS 单独打包成一个文件，然后在文档流添加一个 `<link>` 标签引入新生成的文件，不过弊端就是：引入了几个 CSS，就会生成几个 CSS 文件，导致更多的网络请求。
+
+        ```javascript
+        use: [
+            {
+                loader: 'style-loader/url',
+            },
+            {
+                loader: 'file-loader',
+            }
+        ]
+        ```
+
+        如果生成后的文件路径出错记得修改 `output.publicPath` 属性。
+
+    - `style-loader/useable`：用于控制样式是否使用。
+
+        ```javascript
+        use: [
+            {
+                loader: 'style-loader/useable',
+            },
+            {
+                loader: 'css-loader',
+            }
+        ]
+        ```
+
+        然后在 `index.js` 中可以控制是否使用样式（ 实际上就是添加 / 删除对应的 `<style>` 标签 ）：
+
+        ```javascript
+        import base from './css/base.css'
+
+        // 下面的方法可以在浏览器运行时使用
+        base.use() // 使用该样式
+        base.unuse() // 取消该样式
+        ```
+
+    **`style-loader` 配置选项**：
+
+    - `insertAt`：控制 `<style>` 标签的插入位置。
+    - `insertInto`：控制 `<style>` 标签插入到 DOM。
+    - `singleton`：控制是否只使用**一个** `<style>` 标签。
+    - `transform`：用于 CSS 转化。是一个「函数」，接收处理前的 CSS 内容为参数，需要 `return` 处理后的 CSS 内容。
+
+    更多详情：[style-loader | webpack](https://www.webpackjs.com/loaders/style-loader/)
+
+- `css-loader` 主要用于让 JavaScript 可以 `import` 一个 CSS 文件，以及处理 CSS 内容，并将处理后的内容传递给 `sytle-loader`。
+
+**# 安装**
+
+```bash
+$ npm i --save-dev style-loader css-loader
+```
+
+**# 使用**
+
+❗️需要注意的一个地方是：loader 是按「顺序」使用的。先使用的 loader 应该放在 `use` 数组的最后，**webpack** 会从前往后依次调用。
+
+比如：我们需要先使用 `css-loader` 处理 CSS 后再使用 `style-loader` 插入到文档流中，所以 `use` 数组的第一个元素是 `{loader: 'style-loade', options: {}}`，然后才是 `{loader: 'css-loade', options: {}}`。等到我们之后处理 Less 或者 Sass 的时候，`less-loader` 或者 `sass-loader` 需要放在 `css-loader` 之后，将 Less / Sass 文件处理成正常的 CSS 文件后再交给 `css-loader` 进行处理。
+
+```javascript
+// webpack.config.js
+module.exports = {
+    // ...
+    modules: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: [
+                    {
+                        loader: 'style-loader',
+                        options: {}
+                    },
+                    {
+                        loader: 'css-loader',
+                        options: {}
+                    }
+                ]
+            }
+        ]
+    }
+}
+```
 
 ---
 
