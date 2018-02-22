@@ -43,11 +43,13 @@
 - [文件处理](#文件处理)
 
     - [编译 ES6 / 7](#%E7%BC%96%E8%AF%91-es6--7)
-    - [编译 TypeScript](#编译-TypeScript)
-    - [打包公共代码、代码分割、懒加载](#打包公共代码、代码分割、懒加载)
-    - 编译 Less / Sass
-    - 提取 CSS
-    - PostCss 处理浏览器前缀
+    - [编译 TypeScript](#%E7%BC%96%E8%AF%91-typescript)
+    - [打包公共代码、代码分割、懒加载](#%E6%89%93%E5%8C%85%E5%85%AC%E5%85%B1%E4%BB%A3%E7%A0%81%E4%BB%A3%E7%A0%81%E5%88%86%E5%89%B2%E6%87%92%E5%8A%A0%E8%BD%BD)
+    - [编译 Less / Sass](#%E7%BC%96%E8%AF%91-less--sass)
+    - [提取 CSS](#%E6%8F%90%E5%8F%96-css)
+    - PostCss in Webpack
+    - Browserslist
+    - Tree shaking
     - Css nano 压缩 CSS
     - 自动生成 HTML 模板文件
     - 图片压缩 和 Base64 编码
@@ -760,6 +762,94 @@ module.exports = {
 该选项为一个「布尔值」，如果为 `true` 则会将所有 `import` 的 CSS 文件（ 以上面代码为例 ）都提取出来生成新的 CSS 文件。如果为 `false` （ 默认 ）的话，则仅从初始的 chunk 中提取（ 也就是入口文件同步加载的 CSS，排除了异步加载的 CSS 模块 ）其他动态加载的 CSS 会放在各自的模块中加载，也就是使用 `fallback` 中指定的方式。
 
 当使用 `CommonsChunkPlugin` 并且在公共 chunk 中有来自 `ExtractTextPlugin.extract` 提取的 chunk 时，`allChunks` 必须设置为 `true`。
+
+---
+
+### PostCss in Webpack
+
+何为 PostCSS ？
+
+> 用 JavaScript 转换 CSS 的工具。
+
+主流插件：
+
+- `Autoprefixer`：用于添加各个厂商的前缀。
+- `CSS-nano`：优化压缩 CSS。（ `css-loader` 的 `minimize` 引用的就是 `CSS-nano` ）
+- `CSS-next`：相当于 Babel，让开发者可以使用未来的 CSS 的语法。
+- `postcss-import`：处理 CSS 文件中使用 `@import` 引用的文件直接将其内容直接放置引用的源文件中。（ 但是相对路径可能发生变化，需要使用 `postcss-url` 转换 ）
+- `postcss-url`：转换路径。
+- `postcss-assets`：资源处理。
+
+**# 安装**
+
+```bash
+npm i --save-dev postcss postcss-loader autoprefixer cssnano postcss-cssnext
+```
+
+**# 配置**
+
+因为 **Postcss** 是用来处理 CSS 的，所以需要放在 Less / Sass 的 loader 之前（ 后调用 ）：
+
+```javascript
+use: [
+    {
+        loader: 'css-loader',
+        options: {
+            minimize: true, // 实际上这里使用的就是 CSS-nano
+        }
+    },
+    {
+        loader: 'postcss-loader',
+        options: {
+            /* 添加 postcss 的插件 */
+            ident: 'postcss', // ident 字段表明下方的插件是给 postcss 使用的
+            plugins: [ // 插件列表，记得在 require 后调用一次
+                require('autoprefixer')(),
+                require('postcss-cssnext')()
+            ]
+        }
+    },
+    {
+        loader: 'less-loader'
+    }
+]
+```
+
+需要注意的是：如果使用了 `postcss-cssnext` 后，可以不使用 `autoprefixer`，因为 **CSS-next** 内置了 `autoprefixer`。
+
+---
+
+### Browserslist
+
+当然，当我们时候 **CSS-next** 编译我们的 CSS 文件的时候，也就是涉及「浏览器兼容性」问题的时候，就会有一个针对性的编译目标 `Browsers`。
+
+在很多时候都会用到 **Browserslist** 配置我们的针对性的编译目标，我们可以使用以下两种方式配置我们**公共**的 **Browserslist**（ 所有插件共用 ）：
+
+- 新建 `.browserslistrc` 文件，存放相关配置。
+- 在 `package.json` 文件中添加相关字段。
+
+拿 `package.json` 介绍：
+
+在 `package.json` 中添加 `browserslist` 数组，用于存放编译目标配置（ 详细配置选项可见：[browserslist - queries | npm](https://www.npmjs.com/package/browserslist#queries) ）。
+
+```javascript
+{
+  // ...
+  "devDependencies": {
+    "clean-webpack-plugin": "^0.1.18",
+    "css-loader": "^0.28.9",
+    "file-loader": "^1.1.7",
+    "html-webpack-plugin": "^2.30.1",
+    "style-loader": "^0.20.2",
+    "webpack": "^3.11.0",
+    "webpack-dev-server": "^2.11.1"
+  },
+  "browserslist": [
+    "> = 1%", // 选择全球市场占有率大于等于 1% 的浏览器
+    "last 2 versions", // 选择各个浏览器最新的 2 个版本
+  ]
+}
+```
 
 ---
 
