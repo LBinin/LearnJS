@@ -47,8 +47,8 @@
     - [打包公共代码、代码分割、懒加载](#%E6%89%93%E5%8C%85%E5%85%AC%E5%85%B1%E4%BB%A3%E7%A0%81%E4%BB%A3%E7%A0%81%E5%88%86%E5%89%B2%E6%87%92%E5%8A%A0%E8%BD%BD)
     - [编译 Less / Sass](#%E7%BC%96%E8%AF%91-less--sass)
     - [提取 CSS](#%E6%8F%90%E5%8F%96-css)
-    - PostCss in Webpack
-    - Browserslist
+    - [PostCss in Webpack](#postcss-in-webpack)
+    - [Browserslist](#browserslist)
     - Tree shaking
     - Css nano 压缩 CSS
     - 自动生成 HTML 模板文件
@@ -850,6 +850,10 @@ use: [
   ]
 }
 ```
+
+---
+
+### Tree Shaking
 
 ---
 
