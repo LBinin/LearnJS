@@ -855,6 +855,130 @@ use: [
 
 ### Tree Shaking
 
+问：什么是 **Tree Shaking** ？
+
+> tree shaking 是一个术语，通常用于描述移除 JavaScript 上下文中的未引用代码( dead-code )。它依赖于 ES2015 模块系统中的静态结构特性，例如 import 和 export。这个术语和概念实际上是兴起于 ES2015 模块打包工具 rollup。
+
+说白了就是「去除无关内容」。
+
+- 有关 JavaScript 的 **Tree Shaking**
+
+    使用 [UglifyjsWebpackPlugin](https://www.webpackjs.com/plugins/uglifyjs-webpack-plugin/) 插件以达到我们对 JavaScript 进行 **Tree Shaking**：
+
+    **安装**：
+
+    ```bash
+    $ npm i --save-dev uglifyjs-webpack-plugin
+    ```
+
+    **配置**
+
+    ```javascript
+    // webpack.config.js
+    const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+
+    module.exports = {
+        plugins: [
+            new UglifyJsPlugin()
+        ]
+    }
+    ```
+
+    当然，**webpack** 自带了 **UglifyjsWebpackPlugin** 插件，可以通过 `webpack.optimize` 调用对应插件：
+
+    ```javascript
+    // webpack.config.js
+    const webapck = require('webpack')
+
+    module.exports = {
+        plugins: [
+            new webpack.optimize.UglifyJsPlugin()
+        ]
+    }
+    ```
+
+    详情：[Tree Shaking | webpack](https://www.webpackjs.com/guides/tree-shaking/)。
+
+    额外的，一些框架可以通过 Babel 的对应插件以达到压缩引用代码的目的。
+
+    以 **lodash** 为例，通过 **UglifyjsWebpackPlugin** 插件，压缩无法达到最小的情况，因为 **lodash** 书写的规范不利于 **UglifyjsWebpackPlugin** 进行 **Tree Shaking**，所以我们可以通过 Babel 的 **babel-plugin-lodash** 对我们引用的 **lodash** 进行压缩：
+
+    安装 **Babel** 以及相应的插件
+
+    ```bash
+    npm i --save-dev babel babel-loader babel-core babel-preset-env
+    npm i --save-dev babel-plugin-lodash
+    ```
+
+    配置
+
+    ```javascript
+    // webpack.config.js
+    module.exports = {
+        // ...
+        module: {
+            rules: [
+                // ...
+                {
+                    test: /\.js$/,
+                    use: [
+                        {
+                            loader: 'babel-loader',
+                            options: {
+                                presets: ['env'],
+                                plugins: ['lodash']
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    ```
+
+- 有关 CSS 的 **Tree Shaking**
+
+CSS 的 **Tree Shaking** 需要借助 **Purify CSS**。
+
+**# 安装**
+
+我们需要配合 **glob** 插件使用，**glob** 的作用是用于同步读取目录下指定文件。
+
+```bash
+npm i --save-dev glob-all purifycss-webpack
+```
+
+**# 配置**
+
+```javascript
+// webpack.config.js
+const PurifyCSS = require('pruifycss-webpack')
+const glob = require('glob-all')
+const path = require('path')
+
+module.exports = {
+    // ...
+    plugins: [
+        new ExtractTextWebpackPlugin({
+            filename: '[name].min.css',
+            allChunk: false
+        }),
+        // 如果要提取 CSS，记得放在 ExtractTextWebpackPlugin 后面
+        new PurifyCSS({
+            path: glob.sync([
+                // 检测下面文件中存在的 CSS 选择器
+                path.join(__dirname, './*.html'),
+                path.join(__dirname, './src/*.js')
+            ])
+        })
+    ]
+}
+```
+
+**purify css** 的配置选项：
+
+- `path`：指定需要进行 purify 的文件路径。参数可以使用 `glob.sync([])`。
+
 ---
 
 ## 开发环境
