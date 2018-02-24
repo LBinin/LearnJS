@@ -49,7 +49,10 @@
     - [提取 CSS](#%E6%8F%90%E5%8F%96-css)
     - [PostCss in Webpack](#postcss-in-webpack)
     - [Browserslist](#browserslist)
-    - Tree shaking
+    - [Tree shaking](#tree-shaking)
+    - [图片处理](#图片处理)
+    - 字体处理
+    - 处理第三方 JS 库
     - Css nano 压缩 CSS
     - 自动生成 HTML 模板文件
     - 图片压缩 和 Base64 编码
@@ -97,6 +100,8 @@
 ## 基础知识
 
 ### 模块化开发（ **webpack** 相关 ）
+
+[[ ⬆️ 回到目录]](#知识点)
 
 - JS 模块化
 
@@ -225,6 +230,8 @@
 
 ### 编译 ES6 / 7
 
+[[ ⬆️ 回到目录]](#知识点)
+
 编译 ES6 / 7 我们需要使用 **Babel** 生成静态文件，使用的 loader 的是 **Babel-loader**。
 
 结合 webpack 使用说明：[使用 Babel | Babel中文网](https://babeljs.cn/docs/setup/#installation)。
@@ -333,6 +340,8 @@ $ npm i --save @babel/runtime
 
 ### 编译 TypeScript
 
+[[ ⬆️ 回到目录]](#知识点)
+
 **# 安装**
 
 ```bash
@@ -430,6 +439,8 @@ typings install lodash --save
 
 ### 打包公共代码、代码分割、懒加载
 
+[[ ⬆️ 回到目录]](#知识点)
+
 - 打包公共代码、代码分割详见：[代码分离](../代码分离.md)
 
 - 懒加载（ lazy load ）
@@ -476,6 +487,8 @@ typings install lodash --save
 ---
 
 ### 编译 Less / Sass
+
+[[ ⬆️ 回到目录]](#知识点)
 
 说到结合 **webpack** 对 Less 和 Sass 进行编译之前，不得不先说说在 **webpack** 中对 CSS 的处理。
 
@@ -636,6 +649,8 @@ module: {
 
 ### 提取 CSS
 
+[[ ⬆️ 回到目录]](#知识点)
+
 方式：
 
 1. `extract-loader`，详情 [extract-loader | webpack](https://www.webpackjs.com/loaders/extract-loader/)
@@ -767,6 +782,8 @@ module.exports = {
 
 ### PostCss in Webpack
 
+[[ ⬆️ 回到目录]](#知识点)
+
 何为 PostCSS ？
 
 > 用 JavaScript 转换 CSS 的工具。
@@ -821,6 +838,8 @@ use: [
 
 ### Browserslist
 
+[[ ⬆️ 回到目录]](#知识点)
+
 当然，当我们时候 **CSS-next** 编译我们的 CSS 文件的时候，也就是涉及「浏览器兼容性」问题的时候，就会有一个针对性的编译目标 `Browsers`。
 
 在很多时候都会用到 **Browserslist** 配置我们的针对性的编译目标，我们可以使用以下两种方式配置我们**公共**的 **Browserslist**（ 所有插件共用 ）：
@@ -854,6 +873,8 @@ use: [
 ---
 
 ### Tree Shaking
+
+[[ ⬆️ 回到目录]](#知识点)
 
 问：什么是 **Tree Shaking** ？
 
@@ -938,46 +959,221 @@ use: [
 
 - 有关 CSS 的 **Tree Shaking**
 
-CSS 的 **Tree Shaking** 需要借助 **Purify CSS**。
+    CSS 的 **Tree Shaking** 需要借助 **Purify CSS**。
+
+    **# 安装**
+
+    我们需要配合 **glob** 插件使用，**glob** 的作用是用于同步读取目录下指定文件。
+
+    ```bash
+    npm i --save-dev glob-all purifycss-webpack
+    ```
+
+    **# 配置**
+
+    ```javascript
+    // webpack.config.js
+    const PurifyCSS = require('pruifycss-webpack')
+    const glob = require('glob-all')
+    const path = require('path')
+
+    module.exports = {
+        // ...
+        plugins: [
+            new ExtractTextWebpackPlugin({
+                filename: '[name].min.css',
+                allChunk: false
+            }),
+            // 如果要提取 CSS，记得放在 ExtractTextWebpackPlugin 后面
+            new PurifyCSS({
+                path: glob.sync([
+                    // 检测下面文件中存在的 CSS 选择器
+                    path.join(__dirname, './*.html'),
+                    path.join(__dirname, './src/*.js')
+                ])
+            })
+        ]
+    }
+    ```
+
+    **purify css** 的配置选项：
+
+    - `path`：指定需要进行 purify 的文件路径。参数可以使用 `glob.sync([])`。
+
+---
+
+### 图片处理
+
+[[ ⬆️ 回到目录]](#知识点)
+
+**场景**：
+
+- CSS 中引入的图片
+- 自动合成雪碧图
+- 图片压缩
+- Base64 编码
+
+**工具**：
+
+- `file-loader`：用于引入图片文件。
+- `url-loader`：用于将图片转换为 Base64 编码。
+- `img-loader`：用于压缩图片。
+- `postcss-sprites`：用于合成雪碧图。
 
 **# 安装**
 
-我们需要配合 **glob** 插件使用，**glob** 的作用是用于同步读取目录下指定文件。
-
 ```bash
-npm i --save-dev glob-all purifycss-webpack
+npm i --save-dev file-loader url-loader img-loader postcss-sprites
 ```
 
-**# 配置**
+**# 使用**
+
+- 对图片文件（ `.png`，`.jpg`，`.jpeg`，`.gif` ）使用 `file-loader`
+
+    ```javascript
+    // webapck.config.js
+    module.exports = {
+        // ...
+        module: {
+            rules: [
+                // ...
+                {
+                    // 对图片文件用 file-loader 处理
+                    test: /\.(png|jpg|jpeg|gif)$/,
+                    use: [
+                        {
+                            loader: 'file-loader',
+                            options: {
+                                // ...
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    ```
+
+- 当图片文件小于指定大小时使用 Base64 编码
+
+    ```javascript
+    // webpack.config.js
+    module.exports = {
+        module: {
+            rules: [
+                {
+                    test: /\.(png|jpg|jpeg|gif)$/,
+                    use: [
+                        {
+                            loader: 'url-loader',
+                            options: {
+                                limit: 100 * 1000, // 指定大小
+                                /* 这里可以放置 file-loader 的参数 */
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    ```
+
+    上面的配置表示：当图片大小**小于** 100kb 的时候，`url-loader` 会将图片转换为 Base64 编码。
+
+    `url-loader` 会在图片大小**大于** 100kb 的时候，充当 `file-loader` 的角色，所以可以使用 `file-loader` 的参数，也没有必要再使用 `file-loader`。
+
+- 压缩图片大小
+
+使用 `img-loader` 对图片进行优化处理，压缩各种图片的配置选项详见：[img-loader | GitHub](https://github.com/thetalecrafter/img-loader)。
 
 ```javascript
 // webpack.config.js
-const PurifyCSS = require('pruifycss-webpack')
-const glob = require('glob-all')
-const path = require('path')
-
 module.exports = {
-    // ...
-    plugins: [
-        new ExtractTextWebpackPlugin({
-            filename: '[name].min.css',
-            allChunk: false
-        }),
-        // 如果要提取 CSS，记得放在 ExtractTextWebpackPlugin 后面
-        new PurifyCSS({
-            path: glob.sync([
-                // 检测下面文件中存在的 CSS 选择器
-                path.join(__dirname, './*.html'),
-                path.join(__dirname, './src/*.js')
-            ])
-        })
-    ]
+    module: {
+        rules: [
+            {
+                test: /\.(png|jpg|jpeg|gif)$/,
+                use: [
+                    {
+                        loader: 'img-loader',
+                        options: {
+                            // 对 png 处理
+                            pngquant: {
+                                quality: 80
+                            },
+                            // 对 gif 处理
+                            gifsicle: {
+                                optimizationLevel: 3,
+                            },
+                        }
+                    }
+                ]
+            }
+        ]
+    }
 }
 ```
 
-**purify css** 的配置选项：
+- 合成「雪碧图」
 
-- `path`：指定需要进行 purify 的文件路径。参数可以使用 `glob.sync([])`。
+    ```javascript
+    module.exports = {
+        module: {
+            rules: [
+                {
+                    test: /\.css$/,
+                    use: {
+                        loader: 'postcss-loader',
+                        options: {
+                            /* 添加 postcss 的插件 */
+                            ident: 'postcss', // ident 字段表明下方的插件是给 postcss 使用的
+                            plugins: [ // 插件列表，记得在 require 后调用一次
+                                require('postcss-cssnext')(),
+                                // 用于合成雪碧图
+                                require('postcss-sprites')({
+                                    spritePath: 'dist/assets/sprites/', // 指定雪碧图生成路径
+                                })
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    ```
+
+- 配置 Retina
+
+首先，配置 `webpack.config.js`，在 `postcss-sprites` 添加 `Retina` 字段：
+
+```javascript
+// webpack.config.js
+module.exports = {
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: {
+                    loader: 'postcss-loader',
+                    options: {
+                        ident: 'postcss',
+                        plugins: [
+                            require('postcss-cssnext')(),
+                            require('postcss-sprites')({
+                                spritePath: 'dist/assets/sprites/',
+                                // 配置 Retina
+                                retina: true
+                            })
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}
+```
+
+然后，我们需要更改文件名称告诉 `postcss-sprites` 那些是需要处理的 Retina 图片：将图片名称后面添加 `@2x`、`@3x` 等后缀。（ 记得需要更改在外部文件的引用的名称 ）
 
 ---
 
