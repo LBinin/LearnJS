@@ -53,7 +53,7 @@
     - [图片处理](#图片处理)
     - [字体处理](#字体处理)
     - [处理第三方 JavaScript 库](#%E5%A4%84%E7%90%86%E7%AC%AC%E4%B8%89%E6%96%B9-javascript-%E5%BA%93)
-    - 自动生成 HTML 模板文件
+    - [自动生成 HTML 模板文件](#%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90-html-%E6%A8%A1%E6%9D%BF%E6%96%87%E4%BB%B6)
 
 - [开发环境](#开发环境)
 
@@ -1358,6 +1358,86 @@ module.exports = {
     ]
 }
 ```
+
+---
+
+### 在 HTML 中引入图片
+
+有时候，我们在书写代码的时候与生成的 HTML 文档路径可能会不同，但是在 HTML 我们可能使用了相对路径，这时候生成的 HTML 便无法找到该图片，所以我们可以通过 `html-loader` 配置。同样的道理，我们也可以通过该插件用来处理其他标签的其他属性。
+
+**# 安装**
+
+```bash
+npm i --save-dev html-loader
+```
+
+**# 配置参数**
+
+- `attrs`：参数是一个数组，数组中的每一项是一个规则，规则分为左右两部分，左边代表标签，右边代表标签的属性如：`['img:src']` 表示第一条规则我们需要处理的是 `<img>` 标签的 `src` 属性。
+
+**# 配置**
+
+在 HTML 中：
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>title</title>
+</head>
+<body>
+    <!-- 这里有一个 img 标签，我们需要用 html-loader 处理它的 src 属性 -->
+    <img src="src/assets/images/somepic.png" data-src="src/assets/images/somepic.png">
+</body>
+</html>
+```
+
+在 `webpack.config.js` 中配置：
+
+```javascript
+// webpack.config.js
+module.exports = {
+    module: {
+        rules: [
+            // ...
+            {
+                test: /\.html$/,
+                use: {
+                    loader: 'html-loader',
+                    options: {
+                        attrs: ['img:src', 'img:data-src'] // 默认存在 img:src
+                    }
+                }
+            }
+        ]
+    }
+}
+```
+
+这时候，我们打包成功后，`src` 和 `data-src` 中的路径都会变为生成后的图片的路径。
+
+此外，还有一个办法，不需要使用 `html-loader`：
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <title>title</title>
+</head>
+<body>
+    <!-- 通过 ${} 去 require 一个图片文件 -->
+    <img src="${require('src/assets/images/somepic.png')}" data-src="${require('src/assets/images/somepic.png')}">
+</body>
+</html>
+```
+
+通过以上的方法也可以成功的把 HTML 中的图片交给 **webpack** 处理。
 
 ---
 
