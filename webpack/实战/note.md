@@ -52,7 +52,7 @@
     - [Tree shaking](#tree-shaking)
     - [图片处理](#图片处理)
     - [字体处理](#字体处理)
-    - 处理第三方 JavaScript 库
+    - [处理第三方 JavaScript 库](#%E5%A4%84%E7%90%86%E7%AC%AC%E4%B8%89%E6%96%B9-javascript-%E5%BA%93)
     - 自动生成 HTML 模板文件
 
 - [开发环境](#开发环境)
@@ -1176,6 +1176,8 @@ npm i --save-dev file-loader url-loader img-loader postcss-sprites
 
 ### 字体处理
 
+[[ ⬆️ 回到目录]](#知识点)
+
 关于字体的处理我们可以通过 `url-loader` 来处理字体文件。
 
 在 `webpack.config.js` 中添加：
@@ -1189,7 +1191,7 @@ module.exports = {
             {
                 test: /\.(eot|woff2?|ttf|svg)/,
                 use: {
-                    loader: 'url-loader`
+                    loader: 'url-loader'
                 }
             }
         ]
@@ -1202,7 +1204,7 @@ module.exports = {
 ```javascript
 // ...
 use: {
-    loader: 'url-loader`,
+    loader: 'url-loader',
     options: {
         name: '[name]-[hash:5].[ext]', // 配置字体文件名称
         limit: 5000, // 小于 5000b 大小的字体将转换为 Base64 编码打包进 CSS 文件
@@ -1216,6 +1218,8 @@ use: {
 ---
 
 ### 处理第三方 JavaScript 库
+
+[[ ⬆️ 回到目录]](#知识点)
 
 处理场景：
 
@@ -1263,7 +1267,7 @@ use: {
     npm i --save-dev imports-loader
     ```
 
-    配置 `webpack.config.js`：
+    配置 `webpack.config.js`（ 两种方式选其一 ）：
 
     ```javascript
     // webpack.config.js
@@ -1278,6 +1282,24 @@ use: {
                 // 如果没有 $ 符号结尾，表示解析到某一目录下
             }
         },
+        // 第一种方式，使用 imports-loader
+        module: {
+            rules: [
+                {
+                    // 对某一确定文件注入指定变量，所以 test 指向某一确定文件
+                    test: path.resolve(__dirname, './src/app.js'),
+                    use: [
+                        {
+                            loader: 'imports-loader',
+                            options: {
+                                $: 'jquery'
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+        // 第二种方式，使用 ProvidePlugin
         plugins: [
             new webpack.ProvidePlugin({
                 $: 'jquery'
@@ -1287,6 +1309,55 @@ use: {
         ]
     }
     ```
+
+---
+
+### 自动生成 HTML 模板文件
+
+[[ ⬆️ 回到目录]](#知识点)
+
+参考资料：[输出管理](../输出管理.md)
+
+我们需要使用 `html-webpack-plugin` 插件来为我们自动生成 HTML 文档。
+
+**# 安装**
+
+```bash
+npm i --save-dev html-webpack-plugin
+```
+
+**# 配置**
+
+`html-webpack-plugin` 配置选项：
+
+- `template`：需要生成的 HTML 的模板文件。（ `.html`、`.jade`、`.pug` ）
+- `filename`：在输出目录中，生成的文件的文件名。
+- `minify`：控制是否压缩生成的 HTML 文件。（ 内部借助的是 [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) 插件 ）
+- `chunks`：选择需要生成 HTML 的 chunk 的范围。
+- `jnject`：是否将 `.js`、`.css` 文件以标签的形式插入到 HTML 文档中。
+
+```javascript
+// webpack.config.js
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+
+module.exports = {
+    entry: {
+        app: './index.js'
+    }
+    // ...
+    plugins: [
+        // ...
+        new HtmlWebpackPlugin({
+            filename: 'index.html', // 默认的输出文件名就是 index.html
+            template: './index.html', // 模板文件
+            minify: { // 压缩 HTMl 文件
+                collapseWhitespace: true // 压缩空格以及换行符
+            },
+            chunks: ['app'] // 指定 chunk
+        })
+    ]
+}
+```
 
 ---
 
