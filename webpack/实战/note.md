@@ -51,12 +51,9 @@
     - [Browserslist](#browserslist)
     - [Tree shaking](#tree-shaking)
     - [图片处理](#图片处理)
-    - 字体处理
+    - [字体处理](#字体处理)
     - 处理第三方 JS 库
-    - Css nano 压缩 CSS
     - 自动生成 HTML 模板文件
-    - 图片压缩 和 Base64 编码
-    - 自动生成雪碧图
 
 - [开发环境](#开发环境)
 
@@ -1084,35 +1081,35 @@ npm i --save-dev file-loader url-loader img-loader postcss-sprites
 
 - 压缩图片大小
 
-使用 `img-loader` 对图片进行优化处理，压缩各种图片的配置选项详见：[img-loader | GitHub](https://github.com/thetalecrafter/img-loader)。
+    使用 `img-loader` 对图片进行优化处理，压缩各种图片的配置选项详见：[img-loader | GitHub](https://github.com/thetalecrafter/img-loader)。
 
-```javascript
-// webpack.config.js
-module.exports = {
-    module: {
-        rules: [
-            {
-                test: /\.(png|jpg|jpeg|gif)$/,
-                use: [
-                    {
-                        loader: 'img-loader',
-                        options: {
-                            // 对 png 处理
-                            pngquant: {
-                                quality: 80
-                            },
-                            // 对 gif 处理
-                            gifsicle: {
-                                optimizationLevel: 3,
-                            },
+    ```javascript
+    // webpack.config.js
+    module.exports = {
+        module: {
+            rules: [
+                {
+                    test: /\.(png|jpg|jpeg|gif)$/,
+                    use: [
+                        {
+                            loader: 'img-loader',
+                            options: {
+                                // 对 png 处理
+                                pngquant: {
+                                    quality: 80
+                                },
+                                // 对 gif 处理
+                                gifsicle: {
+                                    optimizationLevel: 3,
+                                },
+                            }
                         }
-                    }
-                ]
-            }
-        ]
+                    ]
+                }
+            ]
+        }
     }
-}
-```
+    ```
 
 - 合成「雪碧图」
 
@@ -1144,28 +1141,55 @@ module.exports = {
 
 - 配置 Retina
 
-首先，配置 `webpack.config.js`，在 `postcss-sprites` 添加 `Retina` 字段：
+    首先，配置 `webpack.config.js`，在 `postcss-sprites` 添加 `Retina` 字段：
+
+    ```javascript
+    // webpack.config.js
+    module.exports = {
+        module: {
+            rules: [
+                {
+                    test: /\.css$/,
+                    use: {
+                        loader: 'postcss-loader',
+                        options: {
+                            ident: 'postcss',
+                            plugins: [
+                                require('postcss-cssnext')(),
+                                require('postcss-sprites')({
+                                    spritePath: 'dist/assets/sprites/',
+                                    // 配置 Retina
+                                    retina: true
+                                })
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    ```
+
+    然后，我们需要更改文件名称告诉 `postcss-sprites` 那些是需要处理的 Retina 图片：将图片名称后面添加 `@2x`、`@3x` 等后缀。（ 记得需要更改在外部文件的引用的名称 ）
+
+---
+
+### 字体处理
+
+关于字体的处理我们可以通过 `url-loader` 来处理字体文件。
+
+在 `webpack.config.js` 中添加：
 
 ```javascript
-// webpack.config.js
 module.exports = {
+    // ...
     module: {
         rules: [
+            // ...
             {
-                test: /\.css$/,
+                test: /\.(eot|woff2?|ttf|svg)/,
                 use: {
-                    loader: 'postcss-loader',
-                    options: {
-                        ident: 'postcss',
-                        plugins: [
-                            require('postcss-cssnext')(),
-                            require('postcss-sprites')({
-                                spritePath: 'dist/assets/sprites/',
-                                // 配置 Retina
-                                retina: true
-                            })
-                        ]
-                    }
+                    loader: 'url-loader`
                 }
             }
         ]
@@ -1173,7 +1197,21 @@ module.exports = {
 }
 ```
 
-然后，我们需要更改文件名称告诉 `postcss-sprites` 那些是需要处理的 Retina 图片：将图片名称后面添加 `@2x`、`@3x` 等后缀。（ 记得需要更改在外部文件的引用的名称 ）
+通过以上的方式 `url-loader` 会将字体文件会转换成 Base64 编码打包进 CSS 文件，如果我们需要提取出来我们可以添加 `options`：
+
+```javascript
+// ...
+use: {
+    loader: 'url-loader`,
+    options: {
+        name: '[name]-[hash:5].[ext]', // 配置字体文件名称
+        limit: 5000, // 小于 5000b 大小的字体将转换为 Base64 编码打包进 CSS 文件
+        useRelativePath: true // 根据相对目录生成对应路径
+    }
+}
+```
+
+通过以上配置就可以将字体文件提取出来啦~
 
 ---
 
