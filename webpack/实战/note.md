@@ -52,7 +52,7 @@
     - [Tree shaking](#tree-shaking)
     - [图片处理](#图片处理)
     - [字体处理](#字体处理)
-    - 处理第三方 JS 库
+    - 处理第三方 JavaScript 库
     - 自动生成 HTML 模板文件
 
 - [开发环境](#开发环境)
@@ -1212,6 +1212,81 @@ use: {
 ```
 
 通过以上配置就可以将字体文件提取出来啦~
+
+---
+
+### 处理第三方 JavaScript 库
+
+处理场景：
+
+- 第三方库存在于某 CDN 上。
+
+    该场景可以通过直接在 HTML 中添加静态 `<script>` 标签。
+
+- 第三方库存在于 npm 中。
+
+    我们可以通过 `webpack.providePlugin` 插件处理第三方库的全局变量，以 **jQuery** 为例子：
+
+    安装 **jQuery**：
+
+    ```bash
+    npm i --save jquery
+    ```
+
+    在 `webpack.config.js` 中配置：
+
+    ```javascript
+    // webpack.config.js
+    const webpack = require('webpack')
+    module.exports = {
+        // ...
+        plugins: [
+            new webpack.ProvidePlugin({
+                // 其中的参数以键值对的方式存在
+                $: 'jquery' // 表示引入 jQuery 并注入到 $ 变量
+            })
+        ]
+    }
+    ```
+
+    通过上述配置后，就可以在全局使用 `$` 变量。
+
+- 第三方库存在于本地文件，不受 npm 管辖。
+
+    我们可以通过 `imports-loader` 处理本地存在的第三方库：
+
+    假设，我们本地存在一个 `src/libs/jquery.min.js` 文件，我们需要引入到我们的项目中作为一个全局变量。
+
+    安装：
+
+    ```bash
+    npm i --save-dev imports-loader
+    ```
+
+    配置 `webpack.config.js`：
+
+    ```javascript
+    // webpack.config.js
+    path = require('path')
+    module.exports = {
+        // ...
+        resolve: {
+            // 我们可以通过 resolve.alias 字段设置「别名」
+            alias: {
+                jquery$: path.resolve(__dirname, './src/libs/jquery.min.js')
+                // 上面表示将 jquery 关键字解析到某个文件下
+                // 如果没有 $ 符号结尾，表示解析到某一目录下
+            }
+        },
+        plugins: [
+            new webpack.ProvidePlugin({
+                $: 'jquery'
+                // 仍然使用 ProvidePlugin 将前面的 jquery.min.js 注入到 $ 变量中
+                // 不过这时候的 jquery 不再是 node_modules 目录下的 jquery，而是我们之前设置的 alias 下的别名
+            })
+        ]
+    }
+    ```
 
 ---
 
