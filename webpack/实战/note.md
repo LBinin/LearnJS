@@ -54,6 +54,7 @@
     - [字体处理](#字体处理)
     - [处理第三方 JavaScript 库](#%E5%A4%84%E7%90%86%E7%AC%AC%E4%B8%89%E6%96%B9-javascript-%E5%BA%93)
     - [自动生成 HTML 模板文件](#%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90-html-%E6%A8%A1%E6%9D%BF%E6%96%87%E4%BB%B6)
+    - [在 HTML 中引入图片](#%E5%9C%A8-html-%E4%B8%AD%E5%BC%95%E5%85%A5%E5%9B%BE%E7%89%87)
 
 - [开发环境](#开发环境)
 
@@ -1333,7 +1334,7 @@ npm i --save-dev html-webpack-plugin
 - `template`：需要生成的 HTML 的模板文件。（ `.html`、`.jade`、`.pug` ）
 - `filename`：在输出目录中，生成的文件的文件名。
 - `minify`：控制是否压缩生成的 HTML 文件。（ 内部借助的是 [html-minifier](https://github.com/kangax/html-minifier#options-quick-reference) 插件 ）
-- `chunks`：选择需要生成 HTML 的 chunk 的范围。
+- `chunks`：选择需要插入到 HTML 的 chunk 的范围。
 - `jnject`：是否将 `.js`、`.css` 文件以标签的形式插入到 HTML 文档中。
 
 ```javascript
@@ -1362,6 +1363,8 @@ module.exports = {
 ---
 
 ### 在 HTML 中引入图片
+
+[[ ⬆️ 回到目录]](#知识点)
 
 有时候，我们在书写代码的时候与生成的 HTML 文档路径可能会不同，但是在 HTML 我们可能使用了相对路径，这时候生成的 HTML 便无法找到该图片，所以我们可以通过 `html-loader` 配置。同样的道理，我们也可以通过该插件用来处理其他标签的其他属性。
 
@@ -1442,6 +1445,16 @@ module.exports = {
 ---
 
 ## 开发环境
+
+### 搭建开发环境
+
+关于搭建开发环境有三种方法：
+
+1. webpack watch mode
+2. webpack-dev-server
+3. express + webpack-dev-middleware
+
+参考资料：[开发工具 | 自动构建](../开发工具.md#自动构建)
 
 ---
 
