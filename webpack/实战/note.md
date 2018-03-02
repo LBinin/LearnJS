@@ -54,11 +54,7 @@
     - [字体处理](#字体处理)
     - [处理第三方 JavaScript 库](#%E5%A4%84%E7%90%86%E7%AC%AC%E4%B8%89%E6%96%B9-javascript-%E5%BA%93)
     - [自动生成 HTML 模板文件](#%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90-html-%E6%A8%A1%E6%9D%BF%E6%96%87%E4%BB%B6)
-<<<<<<< HEAD
     - [在 HTML 中引入图片](#%E5%9C%A8-html-%E4%B8%AD%E5%BC%95%E5%85%A5%E5%9B%BE%E7%89%87)
-=======
-    - [在 HTML 中引入图片]
->>>>>>> f20d6ba31633267cf6c74f8da861ade8c6b91245
 
 - [开发环境](#开发环境)
 
@@ -465,7 +461,7 @@ typings install lodash --save
 
     - `require.include` 详情：[Module Method | webpack](https://www.webpackjs.com/api/module-methods/#require-include)
 
-        `require.include` 只接受一个参数，就是需要加载的模块。作用是只加载，但是执行，和 `require.ensure` 类似，区别是它只接收一个参数，其中一个使用场景如下：
+        `require.include` 只接受一个参数，就是需要加载的模块。作用是只加载，但是不执行，和 `require.ensure` 类似，区别是它只接收一个参数，其中一个使用场景如下：
 
         > 当两个子模块都依赖「同一个」第三方模块的时候，可以在父模块中**提前加载**，子模块就不会再次加载该第三方模块。
 
