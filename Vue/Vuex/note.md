@@ -275,6 +275,84 @@ mutations: {
 store.commit('increment', 10)
 ```
 
+不过一般载荷应该是一个对象，这样可以包含多个字段并且记录的 `mutation` 会更易读：
+
+```JavaScript
+// ...
+mutations: {
+  increment (state, payload) {
+    state.count += payload.amount
+  }
+}
+store.commit('increment', {
+  amount: 10
+})
+```
+
+提交 `mutation` 的另一种方式是直接使用包含 `type` 属性（ 也就是函数名 ）的对象：
+
+```JavaScript
+store.commit({
+  type: 'increment',
+  amount: 10
+})
+```
+
+当使用对象风格的提交方式，整个对象都作为载荷传给 `mutation` 函数，因此 handler 保持不变：
+
+```JavaScript
+mutations: {
+  increment (state, payload) {
+    state.count += payload.amount
+  }
+}
+```
+
+关于编程风格，可以用常量替代 `mutation` 事件类型：
+
+```JavaScript
+// mutation-types.js
+export const SOME_MUTATION = 'SOME_MUTATION'
+
+// store.js
+import Vuex from 'vuex'
+import { SOME_MUTATION } from './mutation-types'
+
+const store = new Vuex.Store({
+  state: { ... },
+  mutations: {
+    [SOME_MUTATION] (state) {
+      // mutate state
+    }
+  }
+})
+```
+
+在其他组件中，可以使用 `this.$store.commit('xxx')` 提交 `mutation`。
+
+或者使用 `mapMutations` 辅助函数，将组件中的 `methods` 映射为 `store.commit` 调用（ **需要在根节点注入 store** ）。
+
+```JavaScript
+import { mapMutations } from 'vuex'
+
+export default {
+  // ...
+  methods: {
+    ...mapMutations([
+      'increment', // 将 `this.increment()` 映射为 `this.$store.commit('increment')`
+
+      // `mapMutations` 也支持载荷：
+      'incrementBy' // 将 `this.incrementBy(amount)` 映射为 `this.$store.commit('incrementBy', amount)`
+    ]),
+    ...mapMutations({
+      add: 'increment' // 将 `this.add()` 映射为 `this.$store.commit('increment')`
+    })
+  }
+}
+```
+
+❗️一条重要的原则就是：要记住 `mutation` 必须是「同步函数」。
+
 ---
 
 ### Action
