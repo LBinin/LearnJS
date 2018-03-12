@@ -275,7 +275,7 @@ mutations: {
 store.commit('increment', 10)
 ```
 
-不过一般载荷应该是一个对象，这样可以包含多个字段并且记录的 `mutation` 会更易读：
+🤔 不过一般推荐载荷应该是一个对象，这样可以包含多个字段并且记录的 `mutation` 会更易读：
 
 ```JavaScript
 // ...
@@ -333,6 +333,7 @@ const store = new Vuex.Store({
 或者使用 `mapMutations` 辅助函数，将组件中的 `methods` 映射为 `store.commit` 调用（ **需要在根节点注入 store** ）。
 
 ```JavaScript
+// 引入 mapMutations
 import { mapMutations } from 'vuex'
 
 export default {
@@ -351,12 +352,388 @@ export default {
 }
 ```
 
-❗️一条重要的原则就是：要记住 `mutation` 必须是「同步函数」。
+❗️一条重要的原则就是：要记住 `mutation` 必须是「同步函数」，否则状态的改变都是不可追踪的。
+
+如果需要异步操作，请选择 Action 👇🏻
 
 ---
 
 ### Action
 
+于 `mutation` 的不同在于：
+
+- **Action** 提交的是 `mutation`，而不是直接变更状态。
+- **Action** 可以包含任意异步操作。
+
+**Action** 函数接受一个与 `store` 实例**具有相同方法和属性**的 `context` 对象（ **注意！不是 store 实例本身** ），因此你可以调用 `context.commit` 提交一个 `mutation`，或者通过 `context.state` 和 `context.getters` 来获取 `state` 和 `getters`。
+
+同时，如果你需要大量使用 commit 的时候，可以使用参数解构：
+
+```JavaScript
+const store = new Vuex.Store({
+  state: {
+    count: 0
+  },
+  mutations: {
+    increment (state) {
+      state.count++
+    }
+  },
+  actions: {
+    increment (context) {
+      context.commit('increment')
+    },
+    // 使用结构
+    increment ({ commit }) {
+      commit('increment')
+    }
+  }
+})
+```
+
+这样一来，可以使用 `dispatch` 方法触发：
+
+```JavaScript
+store.dispatch('increment')
+```
+
+为什么这样写呢，直接用 `commit` 调用不是更方便吗？
+
+上文也说到了，`mutation` 必须是**同步执行的**，如果我们修改 `action` 里的内容可能会更好理解一点：
+
+```JavaScript
+actions: {
+  increment ({ commit }) {
+    setTimeout(() => {
+      commit('increment')
+    }, 1000)
+  }
+}
+```
+
+这样，普通的 `mutation` 就无法做到了，这就是 `action` 和 `mutation` 的区别。
+
+和 `mutation` 一样，支持载荷方式和对象方式进行分发：
+
+```JavaScript
+// 以载荷方式分发
+store.dispatch('increment', {
+  amount: 10
+})
+// 以对象形式分发
+store.dispatch({
+  type: 'increment',
+  amount: 10
+})
+```
+
+同 `mapMutations` 一样，Action 可以使用 `mapActions` 辅助函数将组件的 `methods` 映射为 `store.dispatch`h 调用（ 需要先在根节点注入 `store` ）：
+
+```JavaScript
+// 引入 mapActions
+import { mapActions } from 'vuex'
+
+export default {
+  // ...
+  methods: {
+    ...mapActions([
+      'increment', // 将 `this.increment()` 映射为 `this.$store.dispatch('increment')`
+
+      // `mapActions` 也支持载荷：
+      'incrementBy' // 将 `this.incrementBy(amount)` 映射为 `this.$store.dispatch('incrementBy', amount)`
+    ]),
+    ...mapActions({
+      add: 'increment' // 将 `this.add()` 映射为 `this.$store.dispatch('increment')`
+    })
+  }
+}
+```
+
+如果我们需要知道 `action` 何时结束，并在之后做出相应的操作，可以在 `action` 中返回一个 Promise：
+
+```JavaScript
+actions: {
+  actionA ({ commit }) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        commit('someMutation')
+        resolve()
+      }, 1000)
+    })
+  }
+}
+```
+
+然后我们就可以在调用 `action` 后调用 `then` 方法：
+
+```JavaScript
+store.dispatch('actionA').then(() => {
+  // ...
+})
+```
+
 ---
 
 ### Module
+
+当应用变得非常复杂时，`store` 对象就有可能变得相当臃肿。这时候，为了解决以上问题，Vuex 允许我们将 `store` 分割成模块（ module ）。
+
+举个基本的例子：
+
+```JavaScript
+const moduleA = {
+  state: { ... },
+  mutations: { ... },
+  actions: { ... },
+  getters: { ... }
+}
+
+const moduleB = {
+  state: { ... },
+  mutations: { ... },
+  actions: { ... }
+}
+
+const store = new Vuex.Store({
+  modules: {
+    a: moduleA,
+    b: moduleB
+  }
+})
+
+store.state.a // -> moduleA 的所有状态
+store.state.b // -> moduleB 的所有状态
+```
+
+对于 `getter` 和 `mutation`，接收的第一个参数是模块的 `state`「局部状态对象」，第二个参数为 `getters`「局部计算属性对象」，第三个参数为 `rootState`「根模块状态对象」，第四个为 `rootGetters`「根模块计算属性对象」：
+
+```JavaScript
+modules: {
+  // ...
+  foo: {
+    namespaced: true,
+
+    getters: {
+      // 第一、二个参数为局部内容
+      // 在这个模块的 getter 中，`getters` 被局部化了
+      // 你可以使用 getter 的第四个参数来调用 `rootGetters`
+      someGetter (state, getters, rootState, rootGetters) {
+        getters.someOtherGetter // -> 'foo/someOtherGetter'
+        rootGetters.someOtherGetter // -> 'someOtherGetter'
+      },
+      someOtherGetter: state => { ... }
+    },
+  }
+}
+```
+
+对于 `action`，参数仍然是 `context` 与 `store` 实例**具有相同方法和属性**，该对象中，`state` 为「局部状态对象」，`rootState` 为「根模块状态对象」，`getters` 为「局部计算属性对象」，`rootGetters` 为「根模块计算属性对象」，`commit` 为「`mutation` 分发方法」，`dispatch` 为「`action` 分发方法」：
+
+```JavaScript
+modules: {
+  foo: {
+    namespaced: true,
+
+    actions: {
+      // 在这个模块中， dispatch 和 commit 也被局部化了
+      // 他们可以接受 `root` 属性以访问根 dispatch 或 commit
+      someAction ({ dispatch, commit, getters, rootGetters }) {
+        getters.someGetter // -> 'foo/someGetter'
+        rootGetters.someGetter // -> 'someGetter'
+
+        // 对局部内容的 `someOtherAction` 方法进行分发
+        dispatch('someOtherAction') // -> 'foo/someOtherAction'
+        // 对根模块的 `someOtherAction` 方法进行分发
+        dispatch('someOtherAction', null, { root: true }) // -> 'someOtherAction'
+
+        // 同上
+        commit('someMutation') // -> 'foo/someMutation'
+        commit('someMutation', null, { root: true }) // -> 'someMutation'
+      },
+      // 载荷方法
+      someOtherAction (ctx, payload) { ... }
+    }
+  }
+}
+```
+
+模块内部的 `action`、`mutation` 和 `getter` 是**默认**注册在**全局命名空间**的，这样使得多个模块能够对同一 `mutation` 或 `action` 作出响应。
+
+可以通过添加 `namespaced: true` 的方式使其成为**命名空间模块**。当模块被注册后，它的所有 `getter`、`action` 及 `mutation` 都会自动根据模块注册的路径调整命名：
+
+```JavaScript
+const store = new Vuex.Store({
+  modules: {
+    account: {
+      namespaced: true,
+
+      // 模块内容（module assets）
+      state: { ... }, // 模块内的状态已经是嵌套的了，使用 `namespaced` 属性不会对其产生影响
+      getters: {
+        isAdmin () { ... } // -> getters['account/isAdmin']
+      },
+      actions: {
+        login () { ... } // -> dispatch('account/login')
+      },
+      mutations: {
+        login () { ... } // -> commit('account/login')
+      },
+
+      // 嵌套模块
+      modules: {
+        // 继承父模块的命名空间，不设置 namespaced
+        myPage: {
+          state: { ... },
+          getters: {
+            profile () { ... } // -> getters['account/profile']
+          }
+        },
+
+        // 进一步嵌套命名空间
+        posts: {
+          namespaced: true,
+
+          state: { ... },
+          getters: {
+            popular () { ... } // -> getters['account/posts/popular']
+          }
+        }
+      }
+    }
+  }
+})
+```
+
+上面的例子需要注意的几个点：
+
+- 不设置 `namespaced` 的话，将会继承父模块的命名空间。
+- 对于设置 `namespaced` 的非根模块，将会进一步嵌套命名空间。
+- 对于根模块中的内容已经是嵌套的了，设置 `namespaced` 对根模块内容不起作用。
+
+---
+
+推荐的项目结构：
+
+    ├── index.html
+    ├── main.js
+    ├── api
+    │   └── ... # 抽取出API请求
+    ├── components
+    │   ├── App.vue
+    │   └── ...
+    └── store
+        ├── index.js          # 我们组装模块并导出 store 的地方
+        ├── actions.js        # 根级别的 action
+        ├── mutations.js      # 根级别的 mutation
+        └── modules
+            ├── cart.js       # 购物车模块
+            └── products.js   # 产品模块
+
+---
+
+Vuex 的 `store` 接受 `plugins` 选项，这个选项暴露出每次 `mutation` 的钩子。
+
+Vuex 插件就是一个函数，它接收 `store` 作为唯一参数：
+
+```JavaScript
+export default function createWebSocketPlugin (socket) {
+  return store => {
+    socket.on('data', data => {
+      store.commit('receiveData', data)
+    })
+    store.subscribe(mutation => {
+      if (mutation.type === 'UPDATE_DATA') {
+        socket.emit('update', mutation.payload)
+      }
+    })
+  }
+}
+const plugin = createWebSocketPlugin(socket)
+
+const store = new Vuex.Store({
+  state,
+  mutations,
+  plugins: [plugin]
+})
+```
+
+---
+
+在创建 `store` 的时候传入 `strict: true` 以开启严格模式：
+
+```JavaScript
+const store = new Vuex.Store({
+  // ...
+  strict: true
+})
+```
+
+❗️**不要在发布环境下启用严格模式！**
+
+严格模式会深度监测状态树来检测不合规的状态变更。所以请确保在发布环境下关闭严格模式，以避免性能损失。
+
+所以需要做一些修改：
+
+```JavaScript
+const store = new Vuex.Store({
+  // ...
+  strict: process.env.NODE_ENV !== 'production'
+})
+```
+
+---
+
+在表单处理中，如果直接使用 `v-model` 命令去绑定一个 Vuex `store` 对象的某个属性，你会发现因为 Vuex 不允许直接修改 `state` 中的状态，`v-model` 直接的修改会导致报错。
+
+解决方法：根据 `v-model` 的原理，更换绑定的值和监听的事件。
+
+```HTML
+<input :value="message" @input="updateMessage">
+```
+
+```JavaScript
+import { mapState } from 'vuex'
+
+// ...
+computed: {
+  ...mapState({
+    message: state => state.obj.message // obj 为某一状态对象
+  })
+},
+methods: {
+  updateMessage (e) {
+    this.$store.commit('updateMessage', e.target.value)
+  }
+}
+```
+
+`mutation` 函数内容：
+
+```JavaScript
+// ...
+mutations: {
+  updateMessage (state, message) {
+    state.obj.message = message
+  }
+}
+```
+
+或者你认为这样变得非常的繁杂，也可以使用带有 `setter` 的双向绑定计算属性（ 个人推荐 ）：
+
+```HTML
+<input v-model="message">
+```
+
+```JavaScript
+// ...
+computed: {
+  message: {
+    get () {
+      return this.$store.state.obj.message
+    },
+    set (value) {
+      this.$store.commit('updateMessage', value)
+    }
+  }
+}
+```
