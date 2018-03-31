@@ -83,3 +83,25 @@
 5. 语义化的意义是什么
 
     首先，HTML 是一个文档，需要开发者容易阅读和理解，另一方面，机器（ 一些读屏软件、SEO ）也更容易理解页面结构。
+
+6. 那些元素可以自闭合？
+
+    `img`、`input`、`br`、`hr`、`meta`、`link`。
+
+7. HTML 和 DOM 的关系。
+
+    HTML 仅仅只是字符串，而 DOM 是由 HTML 解析而来的一个具有结构的「树」，通过 JavaScript 可以对 DOM 进行维护。
+
+8. property 和 attribute 有什么不同？
+
+    举个例子：`<input type="text" value="1" />`。
+
+    上面的 HTML 属性 `value` 就是一个 attribute，只能通过 `setAttribute` 进行更改，但是 property 是 `$0.value`，可以直接进行 get 和 set 并实时渲染。所以 attribute 是「死」的，property 是「活」的。
+
+9. `form` 的作用有哪些？
+
+    1. 用于直接提交表单。
+    2. 使用 `submit` 和 `reset` 按钮。
+    3. 便于大部分浏览器保存表单信息。
+    4. 第三方库可以整体取值。
+    5. 第三方库可以进行表单验证。
