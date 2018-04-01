@@ -74,3 +74,12 @@
     - 新的语义化元素，如 `<nav>`、`<section>`、`<article>`、`<footer>` 等。
     - 表单增强，如：表单验证，新的类型 `range`、`number` 等，详见 [HTML5 Input 类型](http://www.w3school.com.cn/html5/html_5_form_input_types.asp)
     - 新的 API，这是最大的变化，如：application-cache、音频视频标签、图形 Canvas 或 SVG、实时通讯 webscoket、本地存储 localstorage、本地存储 indexDB、增加获取定位、加速计、陀螺仪等设备信息的能力。
+
+4. `em` 和 `i` 有什么区别？
+
+    `em` 是语义化的标签，表「强调」；
+    在以前，`i` 是纯样式的标签，表「斜体」（ italic ），现在一般用于显示图标，表「icon」。
+
+5. 语义化的意义是什么
+
+    首先，HTML 是一个文档，需要开发者容易阅读和理解，另一方面，机器（ 一些读屏软件、SEO ）也更容易理解页面结构
