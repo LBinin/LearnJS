@@ -166,3 +166,20 @@
 
         - iconfont：详情 [Iconfont-阿里巴巴矢量图标库](http://www.iconfont.cn/)
 
+    2. 行高
+
+        - 行高的构成
+
+            `line-box` 表示一整行的盒子，里面可以有许多 `inline-box`。
+
+            没有标签的内容是「匿名内联元素」。
+
+            `line-height` 可以撑起 `line-box` 的高度，但是不会影响 `inline-box`（ 内联元素 ）布局的高度。
+
+            行高是 `line-box` 的高度，是由 `inline-box` 的高度撑起的。
+
+            `inline-box` 元素的 `background` 是根据字体的顶部和底部渲染的。
+
+        - 行高相关的现象和方案
+        - 行高的调整
+
