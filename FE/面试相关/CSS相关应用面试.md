@@ -211,17 +211,29 @@
 
         - `background: linear-gradient(角度, 开始颜色, 结束颜色)`；
 
-            其中角度 `0deg` 表示从下到上, 顺时针旋转：
+            其中角度 `0deg` 表示从下到上, 顺时针旋转，如：
 
             `background: linear-gradient(45deg, red, green)`
 
         - `background: linear-gradient(角度, 颜色 位置, 颜色 位置, 颜色 位置)`
 
-            `background: linear-gradient(135deg, red 0, green 50%, blue 100%)`
+            如：`background: linear-gradient(135deg, red 0, green 50%, blue 100%)`
 
-        - asd
+        - 有意思的小例子：网格背景
+
+            ```css
+            .div {
+                background: 
+                linear-gradient(135deg, transparent 0, transparent 49.5%, green 49.5%, green 50.5%, transparent 50.5%, transparent 100%),
+                linear-gradient(45deg, transparent 0, transparent 49.5%, red 49.5%, red 50.5%, transparent 50.5%, transparent 100%);
+
+                background-size: 30px 30px;
+                /* background-size 对渐变背景也同样适用 */
+                /* 可以把渐变背景看做一张图片 */
+            }
+            ```
 
     - 多背景叠加（ CSS3 ）
     - 背景图片和属性（ 雪碧图 ）
-    - base64 和性能优化
+    - Base64 和性能优化：减少 HTTP 请求，但是文件体积变大为原来的 4/3，而且因为放在 CSS 或者 HTML 文件中，导致对应的文件体积增大；所以一般小图标才用 Base64。
     - 多分辨率适配
