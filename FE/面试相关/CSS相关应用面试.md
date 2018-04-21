@@ -441,3 +441,161 @@ HTML 仅仅只是字符串，而 DOM 是由 HTML 解析而来的一个具有结�
 1. 添加 `viewport`
 2. rem / viewport / media query
 3. 设计上：隐藏 + 折行 + 留出自适应的空间
+
+---
+
+## CSS 效果实现
+
+引用一句伟人的名言：
+
+> 这个效果怎么实现？ —— 鲁迅
+
+**主要内容**：
+
+- `box-shadow`
+- `text-shadow`
+- `border-radius`
+- `background`
+- `clip-path`
+
+### box-shadow
+
+**格式**：
+
+    box-shadow: x轴偏移量 y轴偏移量 模糊距离? 阴影尺寸? 阴影的颜色? 改为内部阴影?
+
+**box-shadow 图解**：
+
+![box-shadow 详解](./images/CSS_box_shadow_intro.png)
+
+**作用**：
+
+- 营造层次感（ 立体感 ）
+- 充当没有宽度的边框（ `blur: 0px` ）
+- 特殊效果（ 复制数个投影进行作图 ）
+
+### text-shadow
+
+**格式**：
+
+    text-shadow: x轴偏移量 y轴偏移量 模糊距离? 阴影的颜色?
+
+**作用**
+
+- 立体感
+- 印刷品质感
+
+### border-radius
+
+- 圆角矩形
+- 圆形（ 圆角足够大 ）
+
+    ```css
+    .round {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: red;
+    }
+    ```
+
+- 半圆 / 扇形
+
+    **扇形**：
+
+    ```css
+    .shan {
+        width: 100px;
+        height: 100px;
+        border-top-left-radius: 100%;
+        border-top-right-radius: 0;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        background: red;
+    }
+    ```
+
+    **半圆**：
+
+    ```css
+    .half-round {
+        width: 100px;
+        height: 50px;
+        border-top-left-radius: 100px;
+        border-top-right-radius: 100px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        background: red;
+    }
+    ```
+
+- 一些奇怪的角
+
+    ```css
+    .container {
+        width: 200px;
+        height: 200px;
+        background: gold;
+        border-radius: 20px 20px 20px 20px / 40px 40px 40px 40px;
+    }
+    ```
+
+    上面的内容是下方代码的简写：
+
+    ```css
+    .container {
+        width: 200px;
+        height: 200px;
+        background: gold;
+        border-top-left-radius: 20px 40px;
+        border-top-right-radius: 20px 40px;
+        border-bottom-right-radius: 20px 40px;
+        border-bottom-left-radius: 20px 40px;
+    }
+    ```
+
+    上面是 `20px` 分别表示左上、右上、右下、左下的「水平轴」半径，`40px` 分别表示左上、右上、右下、左下的「垂直轴」半径。
+
+    **border-radius 多参数图解**：
+
+    ![border-radius 多参数图解](./images/CSS_border_radius.png)
+
+### background
+
+- 纹理、图案
+- 渐变
+- 雪碧图动画（ 通过控制 `background-position` ）
+- 背景图尺寸适应
+
+    `background-size: 宽度 高度`
+
+    如果使用的是百分比，表示宽度（ 高度 ）为容器的宽度（ 高度 ）的百分之多少。
+
+### clip-path
+
+- 对容器进行裁剪
+- 常见几何图形
+- 自定义路径
+
+```css
+.container {
+    clip-path: inset(100px 50px);
+    /* 宽度 100px, 高度 50px 的「矩形」 */
+
+    clip-path: circle(50px at 100px 100px);
+    /* 以 100px 100px 的位置为圆心，裁剪一个半径为 50px 的圆 */
+
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    /* 定义了一个四边形，上面为 4 个顶点的位置 `x, y` */
+}
+```
+
+裁剪后容器的定位不变。
+
+### 3D 变换
+
+- 变换 transform
+
+    transform 的变换是有顺序的。
+
+- 阿萨德
