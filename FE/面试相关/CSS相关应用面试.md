@@ -596,6 +596,51 @@ HTML 仅仅只是字符串，而 DOM 是由 HTML 解析而来的一个具有结�
 
 - 变换 transform
 
-    transform 的变换是有顺序的。
+    transform 中的变换内容是有顺序的（ 比如先位移后旋转和先旋转后位移是不一样的 ）。
 
-- 阿萨德
+- 关于 3D 变换，详见例子（ 正在编写 ）
+
+### CSS 效果实现面试真题
+
+#### 1. 如何用一个 div 画 ***
+
+可以使用 `box-shadow` 进行无限投影（ 可以产生无数个自身的复制 ），配合 `::before`、`::after`。
+
+#### 2. 如何产生不占空间的边框
+
+1. `box-shadow` 的第四个参数（ 阴影扩展 ）
+2. `outline`
+3. `box-sizing: border-box`
+
+#### 3. 如何实现圆形元素（ 头像 ）
+
+`border-radius: 50%`
+
+#### 4. 如何实现 iOS 图标的圆角
+
+`clip-path: (svg)`；其中 svg 可以是其他软件生成。
+
+#### 5. 如何实现半圆、扇形等图形
+
+`border-radius` 组合：
+
+- 有无边框
+- 边框粗细
+- 圆角半径
+
+#### 6. 如何实现背景图居中显示 / 不重复 / 改变大小
+
+- `background-position`
+- `background-repeat`
+- `background-size(cover / contain)`
+
+#### 7. 如何平移 / 放大一个元素
+
+- `transform: translateX(100px)`
+- `transform: scale(2)`
+
+#### 8. 如何实现 3D 效果
+
+1. 父容器设置 `perspective: 500px` 设置透视距离；
+2. 中间 wrapper 设置 `transform-style: preserve-3d` 设置当前变换为 3D 变换；
+3. 子元素设置 `transform: translateZ(100px) rotate()...` 设置 3D 变换的内容。
