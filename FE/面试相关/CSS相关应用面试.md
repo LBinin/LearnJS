@@ -644,3 +644,19 @@ HTML 仅仅只是字符串，而 DOM 是由 HTML 解析而来的一个具有结�
 1. 父容器设置 `perspective: 500px` 设置透视距离；
 2. 中间 wrapper 设置 `transform-style: preserve-3d` 设置当前变换为 3D 变换；
 3. 子元素设置 `transform: translateZ(100px) rotate()...` 设置 3D 变换的内容。
+
+## CSS 动画
+
+### CSS 动画类型
+
+- 补间动画：`transition`，有开头有结尾，中间过程有浏览器补充。
+- 关键帧动画：`keyframe`，指定多个状态（ 也就是关键帧 ），各个状态之间的动画由浏览器补充。
+- 逐帧动画：每一帧都是认为控制的。
+
+### transition 动画
+
+- 位置 - 平移：`left`、`right`、`margin`、`transform: translate()`；
+- 方位 - 旋转：`transform: rotate()`；
+- 大小 - 缩放：`transform: scale()`；
+- 透明度：`opacity`；
+- 其它 - 线性变换。
