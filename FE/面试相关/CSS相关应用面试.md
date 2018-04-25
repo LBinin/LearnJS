@@ -660,3 +660,38 @@ HTML 仅仅只是字符串，而 DOM 是由 HTML 解析而来的一个具有结�
 - 大小 - 缩放：`transform: scale()`；
 - 透明度：`opacity`；
 - 其它 - 线性变换。
+
+### timing( easing )
+
+> 定义动画进度和时间的关系
+
+**timing function**
+
+![timing function](./images/CSS_transition_timing.png)
+
+### keyframe 关键帧动画
+
+- 相当于多个补间动画
+- 与元素状态的变化无关
+- 定义更加灵活
+
+```css
+.wrapper {
+    animation: run 1s;
+    /* animation-direaction: reverse; */
+    /* animation-fill-mode: forwards; */
+    /* animation-iteration-count: infinite; */
+    /* animation-play-state: paused; */
+}
+
+@keyframe run {
+    0% { /* code */ }
+    100% { /* code */ }
+}
+```
+
+### 逐帧动画
+
+- 适用于无法补间计算的动画
+- 资源较大
+- 使用 `steps()`
