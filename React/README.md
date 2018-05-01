@@ -92,7 +92,7 @@ function tick() {
 setInterval(tick, 1000)
 ```
 
-上面方法通过每秒创建一个新的元素，并使用 `ReactDOM.render()` 方法更新页面内容；
+上面方法通过每秒创建一个新的元素，并使用 `ReactDOM.render()` 方法更新页面内容；
 
 虽然乍一眼看上去十分消耗性能，不过 React 为我们做了一层虚拟 DOM，渲染过程中只会更新**发生了变化的部分**。
 
@@ -142,3 +142,293 @@ React DOM 将 DOM 渲染为 `<h1>Hello, Sara</h1>`。
 1. 组件名称**必须**以大写字母开头；
 2. 组件的返回值**只能**有一个根元素；
 3. `Props` 具有只读性，它是不可修改的。
+
+## State & 生命周期
+
+「状态」与「属性」十分相似，但是状态是 **私有** 的，完全受控于当前组件。
+
+`this.state` 一般用来存放与视觉输出相关的属性（ 即需要在 `render()` 方法中使用 ），否则其他属性应该存在 `this` 的其他字段下。（ 除了 `this.props`、`this.state` 等具有特殊含义的之外 ）
+
+如果需要更新 `state` 中的属性，就需要使用 `setState()` 方法进行设置：
+
+```js
+constructor(props) {
+  super(props) // 类组件应始终使用 props 调用基础构造函数
+  this.state = {
+    date: new Date()
+  }
+}
+// ...
+
+tick() {
+  this.setState({
+    date: new Date()
+  })
+}
+```
+
+例子见 [demo3](./demo/demo3.html)。
+
+关于使用 `setState()`，需要注意的有：
+
+- **不要直接更新状态**
+
+    比如使用 `this.state.comment = 'Hello'`，因为这样不会触发重新渲染组件。
+
+    应该使用 `this.setState({comment: 'Hello'})`。
+
+    构造函数（ `constructor` ）是唯一能够初始化 `this.state` 的地方。
+
+- **状态更新可能是异步的**
+
+    如果你的状态可能是异步更新的，那么就不应该依靠 `this.state.xxx` 去获取他们的值进行计算。
+
+    这时候应该使用 `setState()` 方法的第二种形式：传入一个函数，这个函数接收两个参数，第一个参数 `prevState` 表示的是先前的状态，第二个参数 `props` 表示的是此次更新被应用时的 `props`。
+
+    ```js
+    this.setState((prevState, props) => ({
+      counter: prevState.counter + props.increment
+    }))
+    ```
+
+- **状态更新合并**
+
+    使用 `setState()` 方法更新某个属性的时候，会将传入的对象**合并到当前状态**。
+
+    ```js
+    constructor(props) {
+      super(props)
+      this.state = {
+        posts: [],
+        comments: []
+      }
+    }
+
+    /* 可以调用 setState() 独立地更新它们 */
+
+    componentDidMount() {
+
+      fetchPosts().then(response => {
+        this.setState({
+          posts: response.posts
+        })
+      })
+
+      fetchComments().then(response => {
+        this.setState({
+          comments: response.comments
+        })
+      })
+    }
+    ```
+
+    这里的合并是浅合并，也就是说 `this.setState({comments})` 完整保留了`this.state.posts`（ 不影响 ），但完全替换了 `this.state.comments`。
+
+
+在使用「生命周期」前，我们需要把函数转换为类：
+
+1. 创建一个名称扩展为 `React.Component` 的 ES6 类；
+1. 创建一个叫做 `render()` 的空方法；
+1. 将函数体移动到 `render()` 方法中；
+1. 在 `render()` 方法中，使用 `this.props` 替换 `props`；
+1. 删除剩余的空函数声明。
+
+使用**类**就允许我们使用其它特性，例如局部状态、生命周期钩子。
+
+- `componentDidMount()`：挂载，组件第一次加载到 DOM 中的时候；
+- `componentWillUnmount()`：卸载，DOM 被移除的时候。
+
+## 事件处理
+
+- React 事件绑定属性的命名采用驼峰式写法，而不是小写。
+- 如果采用 JSX 的语法你，需要传入一个函数作为事件处理函数，而不是一个字符串 (DOM 元素的写法)
+
+    相比于 HTML 传统写法：
+
+    ```html
+    <button onclick="activateLasers()"> Activate Lasers </button>
+    ```
+
+    React 写法：
+
+    ```html
+    <button onClick={activateLasers}> Activate Lasers </button>
+    ```
+
+需要注意的是：
+
+- 在 React 中另一个不同是你不能使用返回 `false` 的方式阻止默认行为。必须在处理函数中明确的使用 `preventDefault`。
+
+    ```js
+    function ActionLink() {
+      function handleClick(e) {
+        e.preventDefault()
+        console.log('The link was clicked.')
+      }
+
+      return (
+        <a href="#" onClick={handleClick}>
+          Click me
+        </a>
+      )
+    }
+    ```
+
+    让人激动的是，这里的 `e` 是React 根据 W3C spec 进行定义一个合成事件，所以不需要担心跨浏览器的兼容性问题啦~ [👉🏻 合成事件 SyntheticEvent 详情](https://doc.react-china.org/docs/events.html)
+
+- 谨慎对待 JSX 回调函数中的 `this`。
+
+    类的方法默认是不会绑定 `this` 的，如果没有为方法绑定 `this` 值，调用函数的时候 `this` 的值会是 `undefined`。
+
+    所以，这里有三种方法解决：
+
+    第一个是在构造函数中为方法绑定 `this`，如：`this.handleClick = this.handleClick.bind(this)`；
+
+    第二个是使用「属性初始化器语法」：
+
+    ```js
+    class LoggingButton extends React.Component {
+      handleClick = () => {
+        console.log('this is:', this)
+      }
+
+      render() {
+        return (
+          <button onClick={this.handleClick}>
+            Click me
+          </button>
+        )
+      }
+    }
+    ```
+
+    第三个是在回调函数中使用箭头函数：
+
+    ```js
+    class LoggingButton extends React.Component {
+      handleClick() {
+        console.log('this is:', this)
+      }
+
+      render() {
+        return (
+          <button onClick={(e) => this.handleClick(e)}>
+            Click me
+          </button>
+        )
+      }
+    }
+    ```
+
+    一般来说**建议**使用第二种。第三种方法有个问题就是每次 `LoggingButton` 渲染的时候都会创建一个不同的回调函数。在大多数情况下，这没有问题。然而如果这个回调函数作为一个属性值传入低阶组件，这些组件可能会进行额外的重新渲染。
+
+向处理函数传递事件：
+
+```html
+<button onClick={(e) => this.deleteRow(id, e)}>Delete Row</button>
+<button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>
+```
+
+上面两种方法都 OK，不过在第一种方法中，如果需要传递 React 事件，则需要通过剪头函数显示的向函数进行传递；如果使用第二种 `bind` 方法的话，React 事件会隐式的进行传递，但是接收的话，React 事件是在自定义参数的**后面**接收，如：`preventPop(id, e){ e.preventDefault() alert(name)}`。
+
+## 条件渲染
+
+```js
+function Greeting(props) {
+  const isLoggedIn = props.isLoggedIn
+  if (isLoggedIn) {
+    return <UserGreeting/>
+  }
+  return <GuestGreeting/>
+}
+
+ReactDOM.render(
+  // Try changing to isLoggedIn={true}:
+  <Greeting isLoggedIn={false}/>,
+  document.getElementById('root')
+)
+```
+
+上面的例子会根据 `props` 中的 `isLoggedIn` 输出不同的内容。
+
+### 元素变量
+
+可以使用变量来储存元素。
+
+```js
+render() {
+  const isLoggedIn = this.state.isLoggedIn
+
+  let button = null
+
+  if (isLoggedIn) {
+    button = <LogoutButton onClick={this.handleLogoutClick} />
+  } else {
+    button = <LoginButton onClick={this.handleLoginClick} />
+  }
+
+  return (
+    <div>
+      <Greeting isLoggedIn={isLoggedIn} />
+      {button}
+    </div>
+  )
+}
+```
+
+### 与运算符 &&
+
+可以通过用「花括号」包裹代码在 JSX 中嵌入**任何表达式** ，也包括 JavaScript 的逻辑与 `&&`，它可以更加方便和优雅地条件渲染一个元素：
+
+```html
+<div>
+  <h1>Hello!</h1>
+  {unreadMessages.length > 0 &&
+    <h2>
+      You have {unreadMessages.length} unread messages.
+    </h2>
+  }
+</div>
+```
+
+之所以能这样做，是因为在 JavaScript 中，`true && expression` 总是返回 `expression`，而 `false && expression` 总是返回 `false`。
+
+因此，如果条件是 `true`，`&&` 右侧的元素就会被渲染，如果是 `false`，React 会忽略并跳过它。
+
+### 三目运算符
+
+```html
+<div>
+  The user is <b>{isLoggedIn ? 'currently' : 'not'}</b> logged in.
+</div>
+```
+
+## 列表 & Keys
+
+```js
+const numbers = [1, 2, 3, 4, 5]
+const listItems = numbers.map((number) =>
+  <li key={number.toString()}>{number}</li>
+)
+
+ReactDOM.render(
+  <ul>{listItems}</ul>,
+  document.getElementById('root')
+)
+```
+
+上面这段代码生成了一个 1 到 5 的数字列表。
+
+### Keys
+
+Keys 可以在 DOM 中的某些元素被增加或删除的时候帮助 React 识别哪些元素发生了变化。因此你应当给数组中的每一个元素赋予一个确定的标识。
+
+一个元素的 `key` 最好是这个元素在列表中拥有的一个独一无二的字符串。
+
+所以，当你在 `map()` 方法的内部调用元素时，你最好随时记得为每一个元素加上一个独一无二的 `key`。
+
+注意，Key 应该是在兄弟之间应该是独一无二的，即只有在它和它的兄弟节点对比时才有意义，所以，比方说，如果你提取出一个 `ListItem` 组件，你应该把 `key` 保存在数组中的这个 `<ListItem />` 元素上，而不是放在 `ListItem` 组件中的 `<li>` 元素上。
+
+## 参考资料
+
+[React 中文文档 - 用于构建用户界面的 JavaScript 库](https://doc.react-china.org/)
