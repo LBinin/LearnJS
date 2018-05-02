@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Hello World</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const scaleNames = {
+            c: '摄氏度',
+            f: '华氏度'
+        }
+
+        /**
+         * 摄氏温度转换函数
+         * @param {Number} fahrenheit 华氏温度
+         * @returns 转换后的摄氏温度
+         */
+        function toCelsius(fahrenheit) {
+            return (fahrenheit - 32) * 5 / 9;
+        }
+        
+        /**
+         * 华氏温度转换函数
+         * @param {Number} celsius 摄氏温度
+         * @returns 转换后的华氏温度
+         */
+        function toFahrenheit(celsius) {
+            return (celsius * 9 / 5) + 32;
+        }
+        
+        /**
+         * 转换温度
+         * @param {String} temperature 原始温度
+         * @param {Function} convert 转换函数
+         * @returns 转换后温度
+         */
+        function tryConvert(temperature, convert) {
+            const input = parseFloat(temperature)
+
+            if (Number.isNaN(input)) {
+                return ''
+            }
+
+            const output = convert(input)
+            const rounded = Math.round(output * 1000) / 1000
+            return rounded.toString()
+        }
+        
+        /**
+         * 温度输入类
+         * @class TemperatureInput
+         * @extends {React.Component}
+         */
+        class TemperatureInput extends React.Component {
+            constructor(props) {
+                super(props)
+            }
+
+            handleChange = (e) => {
+                this.props.onTemperatureChange(e.target.value, this.props.scale)
+            }
+
+            render() {
+                return (
+                    <fieldset>
+                        <legend>请用 {scaleNames[this.props.scale]} 输入:</legend>
+                        <input value={this.props.temperature} onChange={this.handleChange} /> <span>{this.props.suffix}</span>
+                    </fieldset>
+                )
+            }
+        }
+        
+        /**
+         * 提示框类
+         * @class MessageBox
+         * @extends {React.Component}
+         */
+        class MessageBox extends React.Component {
+            constructor(props) {
+                super(props)
+            }
+
+            render() {
+                if (this.props.celsius >= 100) {
+                    return (<p>快！水烧开了！</p>)
+                } else {
+                    return (<p>水没烧开，再等等吧！</p>)
+                }
+            }
+        }
+        
+        /**
+         * 计算器类
+         * @class Calculator
+         * @extends {React.Component}
+         */
+        class Calculator extends React.Component {
+            constructor(props) {
+                super(props)
+                this.state = {
+                    scale: 'c',
+                    temperature: ''
+                }
+            }
+
+            handleTemperatureChange(value, scale) {
+                this.setState({
+                    scale,
+                    temperature: value
+                })
+            }
+
+            render() {
+                const scale = this.state.scale
+                const temperature = this.state.temperature
+
+                const celsius = scale === 'f' ? tryConvert(temperature, toCelsius) : temperature
+                const fahrenheit = scale === 'c' ? tryConvert(temperature, toFahrenheit) : temperature
+
+                return (
+                    <div>
+                        <TemperatureInput scale="c" suffix="℃" temperature={celsius} onTemperatureChange={(value, scale) => this.handleTemperatureChange(value, scale)}/>
+                        <TemperatureInput scale="f" suffix="℉" temperature={fahrenheit} onTemperatureChange={(value, scale) => this.handleTemperatureChange(value, scale)}/>
+                        <MessageBox celsius={parseFloat(celsius)} />
+                    </div>
+                )
+            }
+        }
+
+        ReactDOM.render(
+            <Calculator />,
+            document.getElementById('root')
+        )
+    </script>
+</body>
+
+</html>

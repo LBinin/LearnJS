@@ -429,6 +429,45 @@ Keys 可以在 DOM 中的某些元素被增加或删除的时候帮助 React 识
 
 注意，Key 应该是在兄弟之间应该是独一无二的，即只有在它和它的兄弟节点对比时才有意义，所以，比方说，如果你提取出一个 `ListItem` 组件，你应该把 `key` 保存在数组中的这个 `<ListItem />` 元素上，而不是放在 `ListItem` 组件中的 `<li>` 元素上。
 
+## 表单
+
+在 React 中，类似 Vue 中 `v-model`，其值由 React 控制的输入表单元素称为「受控组件」，比如：
+
+```js
+handleChange(event) {
+  this.setState({value: event.target.value})
+}
+handleSubmit(event) {
+  event.preventDefault()
+  alert(this.state.value)
+}
+```
+
+```html
+<form onSubmit={this.handleSubmit}>
+  <input type="text" value={this.state.value} onChange={this.handleChange} />
+  <input type="submit" value="Submit" />
+</form>·
+```
+
+在上面代码中，由于 value 属性是在我们的表单元素上设置的，因此显示的值将始终为 React 数据源上 `this.state.value` 的值。由于每次按键都会触发 `handleChange` 来更新当前 React 的 `state`，所展示的值也会随着不同用户的输入而更新。
+
+其中也包括 `<textarea>` 以及 `<select>` 元素。
+
+例外的是 `type=file` 的 `<input>` 标签，由于该标签的 `value` 属性是只读的， 所以它是 React 中的一个非受控组件。
+
+### 多个输入的解决方法
+
+给每个受控组件添加一个 `name`，然后让函数根据 `name` 自行选择做什么。
+
+例子见 [👉🏻 demo7](./demo7.html)
+
+## 状态提升
+
+类似 Vue 中的「父子组件通信」，多说不如直接上手：
+
+例子见 [👉🏻 demo8](./demo8.html)
+
 ## 参考资料
 
 [React 中文文档 - 用于构建用户界面的 JavaScript 库](https://doc.react-china.org/)

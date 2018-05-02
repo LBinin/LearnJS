@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Hello World</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        class ControlFormElement extends React.Component {
+            constructor(props) {
+                super(props)
+                this.state = {
+                    inputValue: '',
+                    textareaValue: '',
+                    selectValue: 'pear'
+                }
+            }
+
+            handleChange(e) {
+                this.setState({
+                    [e.target.name]: e.target.value // 多受控组件解决方案：添加 name
+                })
+            }
+
+            render() {
+                return (
+                    <div>
+                        <h2>Input 测试</h2>
+                        <input name="inputValue" value={this.state.inputValue} onChange={(e) => (this.handleChange(e))} />
+                        <span> Input 内容：{this.state.inputValue}</span>
+
+                        <h2>Textarea 测试</h2>
+                        <textarea name="textareaValue" value={this.state.textareaValue} onChange={(e) => (this.handleChange(e))}></textarea>
+                        <span> Textarea 内容：{this.state.textareaValue}</span>
+
+                        <h2>Select 测试</h2>
+                        <select name="selectValue" value={this.state.selectValue} onChange={(e) => (this.handleChange(e))}>
+                            <option value="banana">banana</option>
+                            <option value="apple">apple</option>
+                            <option value="pear">pear</option>
+                            <option value="orange">banana</option>
+                        </select>
+                        <span> Select 选中内容：{this.state.selectValue}</span>
+                    </div>
+                    
+                )
+            }
+
+        }
+
+        ReactDOM.render(
+            <ControlFormElement/>,
+            document.getElementById('root')
+        )
+    </script>
+</body>
+
+</html>
