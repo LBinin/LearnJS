@@ -468,6 +468,87 @@ handleSubmit(event) {
 
 例子见 [👉🏻 demo8](./demo8.html)
 
+## 组合 vs 继承
+
+```js
+function FancyBorder(props) {
+  return (
+    <div className={'FancyBorder FancyBorder-' + props.color}>
+      {props.children}
+    </div>
+  )
+}
+
+function WelcomeDialog() {
+  return (
+    <FancyBorder color="blue">
+      <h1 className="Dialog-title">
+        Welcome
+      </h1>
+      <p className="Dialog-message">
+        Thank you for visiting our spacecraft!
+      </p>
+    </FancyBorder>
+  )
+}
+```
+
+上面代码中 `WelcomeDialog` 组件中的
+
+```html
+<h1 className="Dialog-title">
+  Welcome
+</h1>
+<p className="Dialog-message">
+  Thank you for visiting our spacecraft!
+</p>
+```
+
+会被 `FancyBorder` 组件用 `props.children` 的方式插入到 `<div>` 中，所以被传递的所有元素都会出现在最终输出中。
+
+如果你的组件中有多个入口，可以使用以下的方法插入：
+
+```js
+function SplitPane(props) {
+  return (
+    <div className="SplitPane">
+      <div className="SplitPane-left">
+        {props.left}
+      </div>
+      <div className="SplitPane-right">
+        {props.right}
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <SplitPane
+      left={
+        <Contacts />
+      }
+      right={
+        <Chat />
+      } />
+  );
+}
+```
+
+上面代码中 `<Contacts />` 和 `<Chat />` 这样的 React 元素都是对象，所以你可以像任何其他元素一样传递它们。
+
+## React 理念
+
+- [单一功能原则](https://en.wikipedia.org/wiki/Single_responsibility_principle)，在理想状况下，一个组件应该只做一件事情。
+- 考虑你的应用所需要的最小可变状态集。要点是 **DRY**：不要重复 (Don’t Repeat Yourself)
+- `state` 只在交互的时候使用，即随时间变化的数据。所以在创建静态版本的时候不要使用 `state`。
+
+    考虑是否是 `state`，主要考虑以下三点：
+
+    1. 它是通过 `props` 从父级传来的吗？如果是，他可能不是 `state`。
+    2. 它随着时间推移不变吗？如果是，它可能不是 `state`。
+    3. 你能够根据组件中任何其他的 `state` 或 `props` 把它计算出来吗？如果是，它不是 `state`。
+
 ## 参考资料
 
 [React 中文文档 - 用于构建用户界面的 JavaScript 库](https://doc.react-china.org/)
