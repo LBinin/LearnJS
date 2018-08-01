@@ -37,6 +37,24 @@
 
 ## }
 
+## function PostCSS() {
+
+## }
+
+## function Babel() {
+
+## }
+
+## function Vue() {
+
+**const** guide = [
+  '[Vue.js 中文官方文档](https://cn.vuejs.org/)',
+  '[Vue 开发看这篇文章就够了](https://segmentfault.com/a/1190000012692321)',
+  '[Vue2.0 新手入门 — 从环境搭建到发布](http://www.runoob.com/w3cnote/vue2-start-coding.html)'
+]
+
+## }
+
 **const** reference = {
 
 'MDN': '[JavaScript 参考文档](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/)',
