@@ -308,6 +308,51 @@ Page({
 </view>
 ```
 
+## 文件引用
+
+WXML 提供两种文件引用方式 `import` 和 `include`。
+
+为方便说明，现假设有如下 `item.wxml` 文件：
+
+```html
+<!-- item.wxml -->
+<template name="item">
+  <text>{{text}}</text>
+</template>
+```
+
+- **`import`**
+
+  ```html
+  <!-- src 需要写入相对路径 -->
+  <import src="item.wxml"/>
+  <template is="item" data="{{text: 'forbar'}}"/>
+  ```
+
+- **`include`**
+
+  ```html
+  <!-- index.wxml -->
+  <!-- src 需要写入相对路径 -->
+  <include src="header.wxml"/>
+  <view> body </view>
+  <include src="footer.wxml"/>
+
+  <!-- header.wxml -->
+  <view> header </view>
+
+  <!-- footer.wxml -->
+  <view> footer </view>
+  ```
+
+**区别**：
+
+`import` 有作用域的概念，即「只」会 `import` 目标文件中定义的 `template`（ 即仅仅引入 `<template name="xxx"/>` ），而不会 `import` 目标文件 `import` 的 `template` 及其他内容。
+
+如：C import B，B import A，在 C 中可以使用 B 定义的 `template`，在 B 中可以使用 A 定义的 `template`，但是 C 不能使用 A 定义的 `template`。
+
+`include` 可以将目标文件「除了」 `<template/>` `<wxs/>` 外的整个代码引入（ 即不会引入 `<template/>` 和 `<wxs/>` 内容 ），相当于是拷贝到 include 位置
+
 ## 参考资料
 
 [WXML · 小程序](https://developers.weixin.qq.com/miniprogram/dev/framework/view/wxml/)
