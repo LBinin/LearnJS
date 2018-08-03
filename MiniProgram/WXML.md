@@ -157,6 +157,11 @@ Page({
 })
 ```
 
+```html
+<view wx:if="{{flag ? true : false}}"> Hidden </view>
+<view hidden="{{flag ? true : false}}"> Hidden </view>
+```
+
 一般来说，`wx:if` 有更高的「切换消耗」而 `hidden` 有更高的「初始渲染消耗」。因此，如果需要频繁切换的情景下，用 `hidden` 更好，如果在运行时条件不大可能改变则 `wx:if` 较好。
 
 ## 模板
@@ -177,7 +182,7 @@ Page({
 <template is="staffName" data="{{...staffC}}"></template>
 ```
 
-`data` 字段传入对象内容而不是一个对象，格式如：`firstName: 'Hulk', lastName: 'Hu'` 而不需要括号，所以上方使用的对象解包。
+`data` 字段传入「对象内容」而不是一个对象，格式如：`firstName: 'Hulk', lastName: 'Hu'` 而不需要括号，所以上方使用的对象解包。
 
 ```js
 // page.js
