@@ -60,3 +60,4 @@ typings/
 ES6/babel
 
 ./NodeJS/node-lesson/noupload
+.DS_Store

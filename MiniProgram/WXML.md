@@ -200,21 +200,163 @@ Page({
 ## 事件
 
 ```html
-<view bindtap="add"> {{count}} </view>
+<view bindtap="action"></view>
 ```
 
 ```js
 Page({
-  data: {
-    count: 1
-  },
-  add: function(e) {
-    this.setData({
-      count: this.data.count + 1
-    })
+  action: function(e) {
+    console.log(e)
+
+    // e 等于下面对象
+    {
+      /* BaseEvent 基础事件对象属性列表 */
+      "type": "tap",      // 事件类型
+      "timeStamp": 895,   // 事件生成时的时间戳（页面打开到触发事件所经过的毫秒数）
+      "target": {         // 触发事件的源组件的一些属性值集合，就是用户当前进行操作的组件
+        "id": "tapTest",  // 事件源组件的 id
+        "dataset": {      // 事件源组件上由data-开头的自定义属性组成的集合
+          "hi": "WeChat"
+        }
+      },
+      "currentTarget": {  // 事件绑定的当前组件的一些属性值集合，也就是说当前函数是绑定在哪个组件上
+        "id": "tapTest",
+        "dataset": {
+          "hi": "WeChat"
+        }
+      },
+
+      /* CustomEvent 自定义事件对象属性列表（继承 BaseEvent） */
+      "detail": {         // 额外的信息
+        "x": 53,
+        "y": 14
+      },
+
+      /* TouchEvent 触摸事件对象属性列表（继承 BaseEvent） */
+      "touches": [{       // 触摸事件，当前停留在屏幕中的触摸点信息的数组，其中每个元素为一个 Touch 对象，表示当前停留在屏幕上的触摸点。
+        "identifier": 0,  // 触摸点的标识符
+        "pageX": 53,      // 距离文档左上角的距离，文档的左上角为原点 ，横向为X轴，纵向为Y轴
+        "pageY": 14,
+        "clientX": 53,    // 距离页面可显示区域（屏幕除去导航条）左上角距离，横向为X轴，纵向为Y轴
+        "clientY": 14
+      }],
+      "changedTouches": [{// 触摸事件，当前变化的触摸点信息的数组
+        "identifier": 0,
+        "pageX": 53,
+        "pageY": 14,
+        "clientX": 53,
+        "clientY": 14
+      }]
+    }
   }
 })
 ```
+
+其中，数据集的命名格式如下：
+
+```html
+<view data-alpha-beta="1" data-alphaBeta="2" bindtap="bindViewTap"> DataSet Test </view>
+```
+
+```js
+Page({
+  bindViewTap:function(event){
+    event.currentTarget.dataset.alphaBeta === 1 // - 会转为驼峰写法
+    event.currentTarget.dataset.alphabeta === 2 // 大写会转为小写
+  }
+})
+```
+
+### detail 字段
+
+自定义事件所携带的数据，如表单组件的提交事件会携带用户的输入，媒体的错误事件会携带错误信息，详见组件定义中各个事件的定义。
+
+点击事件的detail 带有的 x, y 同 pageX, pageY 代表距离文档左上角的距离。
+
+### 事件分类
+
+1. 冒泡事件：当一个组件上的事件被触发后，该事件会向父节点传递。
+2. 非冒泡事件：当一个组件上的事件被触发后，该事件不会向父节点传递。
+
+`bind` 事件绑定不会阻止冒泡事件向上冒泡，`catch` 事件绑定可以阻止冒泡事件向上冒泡，如 `bind:tap`、`catch:touchstart`
+
+```html
+<!-- 只有冒泡事件 -->
+<view id="outer" bindtap="handleTap1">
+  handleTap1
+  <view id="middle" catchtap="handleTap2">
+    handleTap2
+    <view id="inner" bindtap="handleTap3">
+      handleTap3 handleTap2
+    </view>
+  </view>
+</view>
+```
+
+事件的捕获的阶段：
+
+> 自基础库版本 1.5.0 起，触摸类事件支持捕获阶段。捕获阶段位于冒泡阶段之前，且在捕获阶段中，事件到达节点的顺序与冒泡阶段恰好相反。需要在捕获阶段监听事件时，可以采用 `capture-bind`、`capture-catch` 关键字，后者将中断捕获阶段和取消冒泡阶段。
+
+```html
+<view id="outer" bind:touchstart="handleTap1" capture-bind:touchstart="handleTap2">
+  handleTap2 handleTap1
+  <view id="inner" bind:touchstart="handleTap3" capture-bind:touchstart="handleTap4">
+    handleTap2 handleTap4 handleTap3 handleTap1
+  </view>
+</view>
+
+<view id="outer" bind:touchstart="handleTap1" capture-catch:touchstart="handleTap2">
+  handleTap2
+  <view id="inner" bind:touchstart="handleTap3" capture-bind:touchstart="handleTap4">
+    handleTap2
+  </view>
+</view>
+```
+
+## 文件引用
+
+WXML 提供两种文件引用方式 `import` 和 `include`。
+
+为方便说明，现假设有如下 `item.wxml` 文件：
+
+```html
+<!-- item.wxml -->
+<template name="item">
+  <text>{{text}}</text>
+</template>
+```
+
+- **`import`**
+
+  ```html
+  <!-- src 需要写入相对路径 -->
+  <import src="item.wxml"/>
+  <template is="item" data="{{text: 'forbar'}}"/>
+  ```
+
+- **`include`**
+
+  ```html
+  <!-- index.wxml -->
+  <!-- src 需要写入相对路径 -->
+  <include src="header.wxml"/>
+  <view> body </view>
+  <include src="footer.wxml"/>
+
+  <!-- header.wxml -->
+  <view> header </view>
+
+  <!-- footer.wxml -->
+  <view> footer </view>
+  ```
+
+**区别**：
+
+`import` 有作用域的概念，即「只」会 `import` 目标文件中定义的 `template`（ 即仅仅引入 `<template name="xxx"/>` ），而不会 `import` 目标文件 `import` 的 `template` 及其他内容。
+
+如：C import B，B import A，在 C 中可以使用 B 定义的 `template`，在 B 中可以使用 A 定义的 `template`，但是 C 不能使用 A 定义的 `template`。
+
+`include` 可以将目标文件「除了」 `<template/>` `<wxs/>` 外的整个代码引入（ 即不会引入 `<template/>` 和 `<wxs/>` 内容 ），相当于是拷贝到 include 位置
 
 ## 参考资料
 
